@@ -2,12 +2,25 @@
 
 ## GLOBAL REQUIREMENTS (CRITICAL)
 1. Code MUST be organized and clear
-2. Single file MUST NOT exceed 200 lines
+2. Single file SHOULD NOT exceed 500 lines (flexible guideline)
 3. Quality > Quantity
 4. Code MUST fulfill requirements
 5. Every file MUST have high code quality
 
 ## Code Generation Rules
+
+### AI Workflow / AI工作流程
+
+**Continuous Execution Rule**:
+- ✅ Default: Continue working until task complete
+- ⚠️ Stop only for: Batch deletion (>3 files), DB drops, prod config changes
+
+**User Intent Analysis**:
+1. Analyze: What is user trying to achieve?
+2. Supplement: Break down into tech details
+3. Execute: Implement with PLAN-EXECUTE pattern
+
+**Example**: "add login" → Analyze (auth needed) → Supplement (form+service+JWT) → Execute (create files)
 
 ### ALWAYS DO
 1. Use PLAN-EXECUTE pattern for complex logic
@@ -23,7 +36,7 @@
 - Leave TODO without issue reference
 
 ## Quality Checklist
-- [ ] All files <= 200 lines
+- [ ] Files reasonably sized (<= 500 lines preferred)
 - [ ] PLAN comments present
 - [ ] Types are explicit
 - [ ] Errors handled
@@ -46,7 +59,7 @@ Examples:
 
 ### Pre-Commit Checklist
 Before suggesting commit:
-1. Check all files < 200 lines
+1. Check files are reasonably sized (<500 lines)
 2. Verify no secrets in code
 3. Ensure tests pass
 4. Confirm proper .gitignore

@@ -4,7 +4,7 @@
 
 ### Global Quality Requirements
 1. CODE MUST BE ORGANIZED AND CLEAR
-2. SINGLE FILE < 200 LINES
+2. SINGLE FILE < 500 LINES (FLEXIBLE GUIDELINE)
 3. QUALITY > QUANTITY
 4. MUST FULFILL REQUIREMENTS
 5. PRODUCTION-READY ON FIRST TRY
@@ -14,6 +14,16 @@
 - Follow project conventions in CLAUDE.md
 - Prefer composition over inheritance
 - Keep functions pure when possible
+
+## AI Workflow Rules / AI工作流程
+
+### Continuous Execution
+**Default**: Keep working until task complete
+**Stop only for**: Batch file deletion (>3), database drops, production config changes
+
+### User Intent Analysis
+**Process**: Analyze intent → Supplement tech details → Execute
+**Example**: "add login" → Analyze (need auth system) → Supplement (LoginForm, authService, JWT) → Execute (create files)
 
 ## PLAN-EXECUTE Pattern (MANDATORY)
 ```

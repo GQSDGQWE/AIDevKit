@@ -10,7 +10,7 @@
 - `.github/copilot-instructions.md` - GitHub Copilot专用规则 (5 KB)
 
 **Features / 功能**:
-- ✅ 200行代码限制
+- ✅ 500行代码限制（灵活指导原则）
 - ✅ PLAN-EXECUTE模式
 - ✅ Git版本控制规则
 - ✅ 上下文管理 (Claude 200K / Gemini 2M)
@@ -18,6 +18,8 @@
 - ✅ 经验教训记录机制
 - ✅ API密钥安全管理
 - ✅ Docker/CI/CD最佳实践
+- ✅ 持续执行规则 (默认执行直到完成)
+- ✅ 用户意图分析 (分析→补充→执行)
 
 ---
 
@@ -32,6 +34,8 @@
 - ✅ 200K上下文管理策略
 - ✅ 总结模板 (项目/技术栈/已完成/当前/下一步)
 - ✅ 经验教训日志 (记录用户指出的错误)
+- ✅ 持续执行规则 (默认持续工作直到任务完成)
+- ✅ 用户意图分析 (3步流程: 分析→补充技术细节→执行)
 
 **Usage / 使用**:
 ```bash
@@ -159,18 +163,22 @@ Error Prevention:
 - [x] Git version control
 - [x] Context management
 - [x] Error learning mechanism
+- [x] Continuous execution workflow
+- [x] User intent analysis
 
 ### Phase 2: Advanced Skills (🔄 In Progress)
 - [x] Playground-style code execution
-- [ ] OpenSkills document processing
-- [ ] Custom skill creation guide
-- [ ] Multi-language support enhancement
+- [ ] OpenSkills document processing (详见 PENDING_FEATURES.md)
+- [ ] Custom skill creation guide (详见 PENDING_FEATURES.md)
+- [ ] Multi-language support enhancement (详见 PENDING_FEATURES.md)
 
 ### Phase 3: Automation Skills (📋 Planned)
-- [ ] Automated code review
-- [ ] Performance profiling
-- [ ] Security vulnerability scanning
-- [ ] Dependency update automation
+- [ ] Automated code review (详见 PENDING_FEATURES.md)
+- [ ] Performance profiling (详见 PENDING_FEATURES.md)
+- [ ] Security vulnerability scanning (详见 PENDING_FEATURES.md)
+- [ ] Dependency update automation (详见 PENDING_FEATURES.md)
+
+**Note**: 所有待实现功能的详细计划请查看 [PENDING_FEATURES.md](PENDING_FEATURES.md)
 
 ---
 
@@ -185,6 +193,9 @@ Error Prevention:
 | Error Prevention | All 3 files | All |
 | API Security | All 3 files | All |
 | Docker/CI/CD | CLAUDE.md | All |
+| Continuous Execution | All 3 files | All |
+| User Intent Analysis | All 3 files | All |
+| Pending Features | PENDING_FEATURES.md | All |
 
 ---
 

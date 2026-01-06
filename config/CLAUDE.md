@@ -35,7 +35,7 @@ database: "[Your Database]"
 ### File Organization
 | Rule | Description |
 |------|-------------|
-| Max Lines | 200 lines per file |
+| Max Lines | 500 lines per file (flexible guideline) |
 | Single Responsibility | One component/module per file |
 | Feature Grouping | Group by feature, not file type |
 
@@ -59,6 +59,62 @@ function process(input) {
 2. **Security** - Validate all inputs, sanitize outputs
 3. **Performance** - Consider time/space complexity
 4. **No Yapping** - Skip unnecessary explanations
+
+## AI Workflow Rules / AI工作流程规则
+
+### Continuous Execution / 持续执行
+**Rule**: AI should continue working until task is complete unless encountering critical safety issues.
+
+**Continue Working**:
+- Multiple file operations
+- Iterative improvements
+- Testing and debugging
+- Documentation updates
+- Code refactoring
+
+**STOP and Ask Confirmation**:
+- ❌ Deleting multiple files (>3 files)
+- ❌ Dropping database tables
+- ❌ Removing entire directories
+- ❌ Modifying production configs
+- ❌ Changing critical system files
+
+**Default Behavior**: 🚀 Keep executing → Complete the task → Report results
+
+### User Intent Analysis / 用户意图分析
+
+**3-Step Process when user provides requirement:**
+
+```yaml
+Step 1: Analyze Intent / 分析意图
+  - What is the user trying to achieve?
+  - What is the technical goal?
+  - What are the implicit requirements?
+  
+Step 2: Supplement Technical Details / 补充技术细节
+  - Break down into technical steps
+  - Identify required files/modules
+  - Determine tech stack and tools
+  - Plan architecture and data flow
+  
+Step 3: Execute Implementation / 执行实现
+  - Follow PLAN-EXECUTE pattern
+  - Create/modify files as needed
+  - Test and verify
+  - Document changes
+```
+
+**Example:**
+
+**User Says**: "我想添加登录功能" (I want to add login)
+
+**AI Should Do**:
+1. **Analyze**: User needs authentication system with login UI + backend validation
+2. **Supplement**: Need login form component, auth service, JWT token handling, password encryption, session management
+3. **Execute**: Create LoginForm.tsx, authService.ts, add auth middleware, update routes
+
+**DON'T**: Immediately ask "what framework?" or "what database?"
+**DO**: Check project structure → Infer tech stack → Ask only if truly ambiguous
 
 ## Git Version Control / Git版本控制
 
