@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": "2026-01-07T01:27:04.608923",
+    "operation": "add",
+    "operands": [
+      10,
+      5
+    ],
+    "result": 15
+  },
+  {
+    "timestamp": "2026-01-07T01:27:04.608923",
+    "operation": "multiply",
+    "operands": [
+      4,
+      7
+    ],
+    "result": 28
+  },
+  {
+    "timestamp": "2026-01-07T01:27:04.608923",
+    "operation": "power",
+    "operands": [
+      2,
+      8
+    ],
+    "result": 256
+  }
+]

@@ -1,0 +1,173 @@
+﻿# GitHub Copilot Instructions - AI Power Pack v2.4
+
+## GLOBAL REQUIREMENTS (CRITICAL)
+1. Code MUST be organized and clear
+2. Single file MUST NOT exceed 200 lines
+3. Quality > Quantity
+4. Code MUST fulfill requirements
+5. Every file MUST have high code quality
+
+## Code Generation Rules
+
+### ALWAYS DO
+1. Use PLAN-EXECUTE pattern for complex logic
+2. Split large files into smaller modules
+3. Follow project conventions in CLAUDE.md
+4. Write self-documenting code
+5. Handle all error cases
+
+### NEVER DO
+- Generate files > 200 lines
+- Skip error handling
+- Use `any` type in TypeScript
+- Leave TODO without issue reference
+
+## Quality Checklist
+- [ ] All files <= 200 lines
+- [ ] PLAN comments present
+- [ ] Types are explicit
+- [ ] Errors handled
+- [ ] Requirements fulfilled
+
+## Git Integration / Git集成
+
+### Generate Commit Messages
+When asked to generate commit message:
+```
+Analyze changes → Determine type → Write clear subject
+
+Format: type(scope): subject
+
+Examples:
+- feat(ui): add dark mode toggle
+- fix(auth): resolve token expiration bug
+- refactor(db): optimize query performance
+```
+
+### Pre-Commit Checklist
+Before suggesting commit:
+1. Check all files < 200 lines
+2. Verify no secrets in code
+3. Ensure tests pass
+4. Confirm proper .gitignore
+
+### Branch Suggestions
+When creating feature:
+- Suggest: `feature/descriptive-name`
+- For bugs: `bugfix/issue-description`
+- For urgent: `hotfix/critical-fix`
+
+### .gitignore Generation
+Always include in new projects:
+```gitignore
+# Language-specific
+node_modules/, venv/, __pycache__/
+
+# Environment & Secrets
+.env, .env.local, *.key, *.pem
+
+# Build & Artifacts
+dist/, build/, *.exe, *.dll
+
+# IDE & OS
+.vscode/, .idea/, .DS_Store, Thumbs.db
+```
+
+## Context Management / 上下文管理
+
+### For Claude (200K) & Gemini (2M)
+When conversation exceeds 100K tokens:
+1. **Summarize**: Compress completed work to key outcomes
+2. **Extract**: Pull out important decisions/patterns
+3. **Trim**: Keep recent 10-20 messages only
+4. **Reference**: Link files instead of pasting content
+
+### Summarization Format
+```markdown
+## Summary [Date]
+**Completed**: 
+- Feature X: [result]
+- Bug Y: [fixed]
+**Current**: [active work]
+**Next**: [pending tasks]
+```
+
+## Code Self-Execution / 代码自运行
+
+### Every File Must Be Runnable
+When generating code, ALWAYS include:
+
+```python
+if __name__ == "__main__":
+    # Test 1: Basic usage
+    result = my_function("test")
+    print(f"Test 1: {result}")
+    
+    # Test 2: Edge case
+    result = my_function("")
+    print(f"Test 2: {result}")
+    
+    # Test 3: Performance
+    import time
+    start = time.time()
+    my_function("benchmark")
+    print(f"Execution: {time.time()-start:.4f}s")
+```
+
+### TypeScript/JavaScript
+```typescript
+if (require.main === module) {
+    console.assert(myFunction(2, 3) === 5);
+    console.log("✓ Tests passed");
+}
+```
+
+## Additional Best Practices / 补充最佳实践
+
+### API Key Security
+```python
+# ✓ CORRECT
+import os
+API_KEY = os.getenv('API_KEY')
+if not API_KEY:
+    raise ValueError("API_KEY not set")
+
+# ✗ NEVER
+API_KEY = "hardcoded-key"  # FORBIDDEN!
+```
+
+### Logging Over Print
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("Use this")  # Not print()
+```
+
+### Dependency Files
+ALWAYS generate:
+- Python: `requirements.txt`
+- Node.js: `package.json` with versions
+- Docker: `Dockerfile` for containerization
+
+### Documentation
+Every function needs:
+```python
+def calculate(x: int, y: int) -> int:
+    """
+    Calculate sum of two numbers.
+    
+    Args:
+        x: First number
+        y: Second number
+        
+    Returns:
+        Sum of x and y
+        
+    Example:
+        >>> calculate(2, 3)
+        5
+    """
+    return x + y
+```
