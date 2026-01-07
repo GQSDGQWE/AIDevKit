@@ -205,20 +205,22 @@ try {
 # Install Go language
 Write-Host ""
 Write-Host "[5/9] Installing Go language..." -ForegroundColor Cyan
-try {
-    $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
+
+# 检查Go是否已安装
+$goCmd = Get-Command go -ErrorAction SilentlyContinue
+if ($goCmd) {
+    $goVersion = & go version 2>&1
+    Write-Host "  ✓ Go already installed: $goVersion" -ForegroundColor Green
+} else {
+    Write-Host "  → Go not found, attempting installation..." -ForegroundColor Gray
     
-    if ($goCheck -match "go version") {
-        Write-Host "  ✓ Go already installed: $goCheck" -ForegroundColor Green
-    } else {
-        Write-Host "  → Checking if Go can be installed..." -ForegroundColor Gray
+    # 检查winget是否可用
+    $wingetCmd = Get-Command winget -ErrorAction SilentlyContinue
+    
+    if ($wingetCmd) {
+        Write-Host "  → Installing Go via winget (this may take a moment)..." -ForegroundColor Gray
         
-        # 检查winget是否可用
-        $wingetCheck = & { winget --version 2>&1 } -ErrorAction SilentlyContinue
-        
-        if ($wingetCheck) {
-            Write-Host "  → Installing Go via winget (this may take a moment)..." -ForegroundColor Gray
-            
+        try {
             # 使用winget安装，移除--silent以避免权限问题
             & winget install --id GoLang.Go --accept-package-agreements --accept-source-agreements 2>&1 | Out-Null
             
@@ -227,10 +229,11 @@ try {
                 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
                 
                 # 再次检查
-                $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
+                $goCmd = Get-Command go -ErrorAction SilentlyContinue
                 
-                if ($goCheck -match "go version") {
-                    Write-Host "  ✓ Go installed successfully: $goCheck" -ForegroundColor Green
+                if ($goCmd) {
+                    $goVersion = & go version 2>&1
+                    Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
                 } else {
                     Write-Host "  ⚠ Go installation completed, but requires terminal restart" -ForegroundColor Yellow
                     Write-Host "  💡 Please close and reopen your terminal, then run:" -ForegroundColor Cyan
@@ -243,26 +246,27 @@ try {
                 Write-Host "     Option 2: Download from https://go.dev/dl/" -ForegroundColor Gray
                 Write-Host "     Option 3: Run: winget install GoLang.Go" -ForegroundColor Gray
             }
-        } else {
-            Write-Host "  ⚠ winget not available" -ForegroundColor Yellow
-            Write-Host "  💡 Install Go manually:" -ForegroundColor Cyan
-            Write-Host "     Download from: https://go.dev/dl/" -ForegroundColor Gray
-            Write-Host "     Or run: choco install golang (if Chocolatey installed)" -ForegroundColor Gray
+        } catch {
+            Write-Host "  ⚠ Go installation error" -ForegroundColor Yellow
+            Write-Host "  💡 Install Go manually: https://go.dev/dl/" -ForegroundColor Cyan
         }
+    } else {
+        Write-Host "  ⚠ winget not available" -ForegroundColor Yellow
+        Write-Host "  💡 Install Go manually:" -ForegroundColor Cyan
+        Write-Host "     Download from: https://go.dev/dl/" -ForegroundColor Gray
+        Write-Host "     Or run: choco install golang (if Chocolatey installed)" -ForegroundColor Gray
     }
-} catch {
-    Write-Host "  ⚠ Go not installed" -ForegroundColor Yellow
-    Write-Host "  💡 Install Go manually: https://go.dev/dl/" -ForegroundColor Cyan
 }
 
 # Install Fabric CLI
 Write-Host ""
 Write-Host "[6/9] Installing Fabric CLI..." -ForegroundColor Cyan
-try {
-    # 检查Go是否安装
-    $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
-    
-    if ($goCheck -match "go version") {
+
+# 检查Go是否安装
+$goCmd = Get-Command go -ErrorAction SilentlyContinue
+
+if ($goCmd) {
+    try {
         Write-Host "  → Installing Fabric via Go..." -ForegroundColor Gray
         & go install github.com/danielmiessler/fabric/cmd/fabric@latest 2>&1 | Out-Null
         
@@ -280,15 +284,15 @@ try {
             Write-Host "  💡 After Go is installed, run:" -ForegroundColor Cyan
             Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
         }
-    } else {
-        Write-Host "  ⚠ Go not found, skipping Fabric CLI" -ForegroundColor Yellow
-        Write-Host "  💡 Fabric CLI requires Go language" -ForegroundColor Cyan
-        Write-Host "     Install Go first, then run:" -ForegroundColor Gray
+    } catch {
+        Write-Host "  ⚠ Fabric CLI installation failed" -ForegroundColor Yellow
+        Write-Host "  💡 Manual installation:" -ForegroundColor Cyan
         Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
     }
-} catch {
-    Write-Host "  ⚠ Fabric CLI skipped" -ForegroundColor Yellow
-    Write-Host "  💡 Manual installation:" -ForegroundColor Cyan
+} else {
+    Write-Host "  ⚠ Go not found, skipping Fabric CLI" -ForegroundColor Yellow
+    Write-Host "  💡 Fabric CLI requires Go language" -ForegroundColor Cyan
+    Write-Host "     Install Go first, then run:" -ForegroundColor Gray
     Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
 }
 
