@@ -1,115 +1,260 @@
-# AI Power Pack v2.4 - Ultimate Coding Assistant Enhancement
-# AI 增强工具包 v2.4 - 终极编程助手升级
+# 🚀 AI Power Pack v2.4 - Professional AI Development Framework
 
-[![GitHub Stars](https://img.shields.io/badge/Fabric-37.8k%E2%98%85-blue)](https://github.com/danielmiessler/fabric)
-[![GitHub Stars](https://img.shields.io/badge/Cursor_Rules-36.7k%E2%98%85-green)](https://github.com/PatrickJS/awesome-cursorrules)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-v2.4.0-orange.svg)](CHANGELOG)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 
----
+> 基于 5 个经实战检验的开源框架，将 AI 助手提升为专业级开发工程师
 
-## 📋 Table of Contents / 目录
+## ⚡ 一键安装（推荐）
 
-1. [What's Inside / 工具包内容](#whats-inside)
-2. [Core Problems Solved / 解决的核心问题](#core-problems-solved)
-3. [Quick Start / 快速开始](#quick-start)
-4. [Usage Examples / 使用示例](#usage-examples)
-5. [SCI Figure Prompts (JSON Config) / SCI 绘图配置](#sci-figure-prompts)
-6. [Learning Path / 学习路径](#learning-path)
-7. [Release Notes / 发布说明](#release-notes)
-8. [Community Resources / 社区资源](#community-resources)
-
----
-
-## 📦 What's Inside / 工具包内容 {#whats-inside}
-
-This toolkit integrates **5 battle-tested open-source frameworks** to transform your AI coding assistant into a professional-grade engineer:
-本工具包集成了 **5 个经过实战检验的开源框架**，将您的 AI 编程助手提升为专业级工程师：
-
-| Component | Stars | Description | 说明 |
-|-----------|-------|-------------|------|
-| **Fabric** | 37.8k⭐ | AI Augmentation Framework by Daniel Miessler | AI 增强框架 |
-| **Cursor Rules** | 36.7k⭐ | 300+ Production-Ready Prompt Templates | 300+ 生产级提示词模板 |
-| **Context Engineering** | Community | Chinese-Language Project Context System | 中文项目上下文系统 |
-| **OpenSkills** | Active | Cross-Platform AI Skills (PDF/Excel/Word) | 跨平台 AI 技能系统 |
-| **UI/UX Pro Max** | Active | Design System for AI-Generated Interfaces | AI 界面设计系统 |
-
-**Package Contents / 包内容**:
-```
-AI-Power-Pack-v2.4-Ultimate-Dist.zip (11.73 KB)
-├── AI-Power-Pack-Ultimate-v2.3.2.exe (11.5 KB) - Main executable / 主程序
-├── One-Click-Deploy.bat (0.45 KB) - Silent installer / 静默安装器
-└── README.md (This file) - Complete documentation / 完整文档
+### Windows (PowerShell)
+```powershell
+iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
 ```
 
----
-
-## 🎯 Core Problems Solved / 解决的核心问题 {#core-problems-solved}
-
-### 1. **Fabric Framework** - [github.com/danielmiessler/fabric](https://github.com/danielmiessler/fabric)
-**The Integration Problem / 集成问题**
-
-> "AI doesn't have a capabilities problem—it has an integration problem." - Daniel Miessler
-> 
-> "AI 不存在能力问题——它存在集成问题。" - Daniel Miessler
-
-**What It Does / 功能**:
-- Organizes 300+ AI prompts ("Patterns") for real-world tasks / 组织 300+ AI 提示词用于实际任务
-- Works with ALL LLMs (OpenAI, Anthropic, Ollama, etc.) / 适用于所有 LLM
-- CLI tool: `fabric --pattern summarize` / 命令行工具
-- REST API server mode / REST API 服务器模式
-- YouTube transcript extraction / YouTube 转录提取
-- Web scraping to markdown / 网页抓取转 markdown
-
-**Example Patterns / 示例模式**:
-- `extract_wisdom`: Extract insights from videos/articles / 从视频/文章提取见解
-- `analyze_claims`: Fact-check with bias detection / 事实核查与偏见检测
-- `write_latex`: Generate academic papers / 生成学术论文
-- `create_coding_feature`: Implement features from user stories / 从用户故事实现功能
-- `code_review`: Security & performance analysis / 安全与性能分析
-
-**Installation / 安装**:
+### macOS / Linux (Bash)
 ```bash
-# One-line install
-curl -fsSL https://raw.githubusercontent.com/danielmiessler/fabric/main/scripts/installer/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+```
 
-# Or via Homebrew (macOS)
-brew install fabric-ai
+### 安装后操作
+1. 重启 Claude Desktop
+2. 重启 VSCode
+3. 开始编码！🎉
+
+📖 详细安装说明: [QUICK_INSTALL.md](QUICK_INSTALL.md)
+
+---
+
+## 📦 核心功能
+
+### 🎯 自动化部署系统（v2.4 新增）
+
+| 工具 | 功能 | 命令 |
+|------|------|------|
+| **一键部署** | 交互式完整部署流程 | `tools\One-Click-Deploy.bat` |
+| **配置部署** | 自动配置 Claude/VSCode | `python tools/deploy_config.py` |
+| **清理工具** | 清除临时文件和缓存 | `python tools/cleanup.py` |
+| **框架打包** | 创建可分发的 ZIP 包 | `python tools/package_framework.py` |
+
+### 🔧 智能特性
+
+- ✅ **自动检测** - 识别 Claude Desktop 和 VSCode 安装位置
+- ✅ **配置写入** - 将规则文件自动部署到系统配置
+- ✅ **错误处理** - 完整的异常处理和超时控制
+- ✅ **双语支持** - 中英文完整支持
+
+### 📁 配置位置
+
+部署后配置文件位置：
+
+```
+Claude Desktop:
+  %APPDATA%\Claude\claude_desktop_config.json
+
+VSCode:
+  %APPDATA%\Code\User\settings.json
+  %APPDATA%\Code\User\copilot-instructions.md
 ```
 
 ---
 
-### 2. **Awesome Cursor Rules** - [github.com/PatrickJS/awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules)
-**The Tech Stack Confusion Problem / 技术栈混乱问题**
+---
 
-**What It Does / 功能**:
-- 300+ `.cursorrules` files for specific tech combinations / 300+ 特定技术组合的配置文件
-- Production-ready patterns from 68 contributors / 68 位贡献者的生产级模式
-- Covers 150+ tech stack combinations / 涵盖 150+ 种技术栈组合
+## 📚 项目结构
 
-**Categories / 类别**:
-1. **Frontend**: React, Next.js 14/15, Vue, Svelte, Angular (40+ variants)
-2. **Backend**: Node.js, Python (FastAPI/Django), Go, Elixir, Laravel (30+ variants)
-3. **Mobile**: React Native, Flutter, SwiftUI, Jetpack Compose
-4. **Testing**: Cypress, Playwright, Jest, Vitest (accessibility & E2E rules)
-5. **Language-Specific**: TypeScript patterns, Python best practices, Solidity
+```
+CONSOL/
+├── config/              # 配置文件（AI 规则）
+│   ├── CLAUDE.md       # Claude Desktop 全局指令
+│   └── copilot-instructions.md  # GitHub Copilot 指令
+│
+├── projects/           # 示例项目
+│   ├── cognis_vault/   # 密码保险库（API + GUI + SDK）
+│   └── aether_engine/  # DevOps 引擎
+│
+├── showcase/           # 5 个完整示例应用
+│   ├── 01_todo_pro/    # 待办事项管理
+│   ├── 02_log_insight/ # 日志分析
+│   ├── 03_crypto_pulse/# 加密货币追踪
+│   ├── 04_container_auth/ # Docker 容器认证
+│   └── 05_doc_flow/    # 文档流程管理
+│
+├── tools/              # 自动化工具
+│   ├── cleanup.py      # 清理工具
+│   ├── deploy_config.py# 配置部署
+│   ├── package_framework.py # 框架打包
+│   └── One-Click-Deploy.bat # 一键部署
+│
+├── docs/               # 文档
+│   ├── DEPLOYMENT_GUIDE.md # 部署指南
+│   ├── INITIAL.md      # 项目说明
+│   ├── GIT_GUIDE.md    # Git 工作流程
+│   └── SKILLS_DEPLOYMENT.md # 技能系统
+│
+└── mcp-servers/        # Model Context Protocol 服务器
+```
 
-**Usage / 使用**:
+---
+
+## 🎯 配置规则说明
+
+### CLAUDE.md - AI Power Pack v2.4 标准
+
+**核心规则：**
+- ✅ **PLAN-EXECUTE 模式** - 先规划后执行
+- ✅ **文件大小控制** - 单文件建议不超过 500 行
+- ✅ **模块化设计** - 单一职责原则
+- ✅ **质量优先** - 代码质量 > 数量
+- ✅ **需求驱动** - 必须满足实际需求
+
+**适用于：**
+- Claude Desktop 全局指令
+- 项目上下文工程
+- 团队开发规范
+
+### copilot-instructions.md - GitHub Copilot 规则
+
+**核心规则：**
+- ✅ **持续执行** - 默认完成整个任务
+- ✅ **意图分析** - 理解用户真实需求
+- ✅ **错误处理** - 完整的异常处理
+- ✅ **类型安全** - 明确的类型定义
+- ✅ **Git 集成** - 自动生成提交消息
+
+**适用于：**
+- VSCode GitHub Copilot
+- 代码生成和补全
+- AI 辅助编程
+
+---
+
+## 🚀 使用示例
+
+### 1. 部署配置
+
 ```bash
-# Browse all patterns at https://cursor.directory
+# 运行一键部署
+tools\One-Click-Deploy.bat
 
-# Download a specific rule
-curl -o .cursorrules https://raw.githubusercontent.com/PatrickJS/awesome-cursorrules/main/rules/nextjs-typescript-tailwind-cursorrules-prompt-file/.cursorrules
+# 选择选项
+1. Full Deploy (Clean + Package + Configure)  # 完整部署
+2. Clean Only                                  # 仅清理
+3. Package Only                                # 仅打包
+4. Configure Only                              # 仅配置
+5. Exit                                        # 退出
+```
 
-# Or use VS Code extension: vscode-cursor-rules
+### 2. 验证部署
+
+**测试 Claude Desktop：**
+```
+问题: "你遵循什么开发标准？"
+预期: 应该提到 AI Power Pack v2.4、PLAN-EXECUTE 模式、500行限制等
+```
+
+**测试 VSCode Copilot：**
+```
+生成任意代码
+预期: 
+- 有 PLAN 注释
+- 代码结构清晰
+- 完整错误处理
+- 文件大小合理
+```
+
+### 3. 运行示例项目
+
+```bash
+# Cognis Vault - 密码保险库
+cd projects/cognis_vault
+python api/main.py          # 启动 API (端口 8888)
+python gui/main_window.py  # 启动 GUI
+
+# Aether Engine - DevOps 引擎
+cd projects/aether_engine
+python gui/dashboard.py    # 启动仪表板
 ```
 
 ---
 
-### 3. **Context Engineering** - [github.com/Haoqi9/context-engineering-intro-zh](https://github.com/Haoqi9/context-engineering-intro-zh)
-**The AI Hallucination Problem / AI 幻觉问题**
+## 🛠️ 常见问题
 
-**What It Does / 功能**:
+### Q: Python 未找到？
+```bash
+python --version
+# 如果未安装，下载: https://www.python.org/downloads/
+# 需要 Python 3.8 或更高版本
+```
+
+### Q: Claude 配置未生效？
+1. 完全关闭 Claude Desktop（不是最小化）
+2. 重新运行 `python tools/deploy_config.py`
+3. 重新启动 Claude Desktop
+4. 验证配置文件: `%APPDATA%\Claude\claude_desktop_config.json`
+
+### Q: VSCode Copilot 没有使用规则？
+1. 检查文件是否存在: `%APPDATA%\Code\User\copilot-instructions.md`
+2. 检查 settings.json 是否包含 Copilot 配置
+3. 重启 VSCode（完全退出）
+4. 在代码编辑器中测试生成代码
+
+### Q: 如何分发给团队？
+```bash
+# 1. 创建分发包
+python tools/package_framework.py
+
+# 2. 找到 ZIP 文件
+# 位置: dist/packages/AI_Power_Pack_v2.4_*.zip
+
+# 3. 发送给团队成员
+
+# 4. 团队成员安装
+# 解压 → 运行 INSTALL.bat → 重启应用
+```
+
+---
+
+## 📖 详细文档
+
+- **部署指南**: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
+- **项目说明**: [docs/INITIAL.md](docs/INITIAL.md)
+- **Git 工作流**: [docs/GIT_GUIDE.md](docs/GIT_GUIDE.md)
+- **技能系统**: [docs/SKILLS_DEPLOYMENT.md](docs/SKILLS_DEPLOYMENT.md)
+
+---
+
+## 🎉 更新日志
+
+### v2.4.0 (2026-01-07)
+- ✨ 新增自动化部署系统
+- ✨ 自动检测并配置 Claude Desktop
+- ✨ 自动检测并配置 VSCode
+- ✨ 新增清理工具 (cleanup.py)
+- ✨ 新增配置部署工具 (deploy_config.py)
+- ✨ 新增框架打包工具 (package_framework.py)
+- ✨ 新增一键部署脚本 (One-Click-Deploy.bat)
+- 🐛 修复网络连接超时问题
+- 📝 完整的部署文档和指南
+
+---
+
+## 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+---
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+**AI Power Pack v2.4** - Professional AI Development Framework
+
+Made with ❤️ by CONSOL Team | 2026
 - Prevents AI from inventing APIs/patterns that don't exist / 防止 AI 编造不存在的 API
 - Enforces project-specific coding standards / 强制执行项目特定编码标准
 - PRP (Plan-Research-Produce) workflow / PRP（计划-研究-生成）工作流

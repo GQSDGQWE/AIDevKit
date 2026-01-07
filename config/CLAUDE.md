@@ -36,6 +36,8 @@ database: "[Your Database]"
 | Rule | Description |
 |------|-------------|
 | Max Lines | 500 lines per file (flexible guideline) |
+| API-First | Every project must provide an API or SDK for external control |
+| MCP Management | AI can autonomously search/install/develop MCP servers |
 | Single Responsibility | One component/module per file |
 | Feature Grouping | Group by feature, not file type |
 
