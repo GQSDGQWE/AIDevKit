@@ -226,18 +226,71 @@ try {
 Write-Host ""
 Write-Host "[6/9] Installing Cursor Rules..." -ForegroundColor Cyan
 try {
-    $cursorRulesUrl = "https://raw.githubusercontent.com/PatrickJS/awesome-cursorrules/main/rules/general-coding-rules.md"
+    Write-Host "  → Creating .cursorrules..." -ForegroundColor Gray
     $cursorRulesFile = Join-Path $PWD ".cursorrules"
     
-    Write-Host "  → Downloading .cursorrules..." -ForegroundColor Gray
-    $webClient = New-Object System.Net.WebClient
-    $cursorContent = $webClient.DownloadString($cursorRulesUrl)
-    $webClient.Dispose()
+    # 使用我们自己的Cursor规则内容
+    $cursorContent = @"
+# AI Power Pack v2.4 - Cursor Rules
+# Auto-generated cursor rules for consistent code quality
+
+## Code Quality Standards
+- Follow PLAN-EXECUTE pattern
+- Max 500 lines per file
+- Single responsibility principle
+- API-First design
+
+## File Organization
+- Feature-based grouping (not file type)
+- api/, sdk/, gui/ structure
+- Clear naming conventions
+
+## Naming Conventions
+- Classes: PascalCase
+- Functions: camelCase
+- Constants: UPPER_SNAKE_CASE
+- Files: kebab-case
+
+## Documentation
+- JSDoc/docstring for all public APIs
+- README.md in each major module
+- Inline comments for complex logic
+
+## Testing
+- Unit tests for all business logic
+- Integration tests for APIs
+- E2E tests for critical paths
+- Test coverage > 80%
+
+## Security
+- Input validation on all endpoints
+- SQL injection prevention
+- XSS prevention
+- CSRF tokens
+- HTTPS only
+
+## Performance
+- Database indexing
+- Query optimization
+- Caching strategy
+- Rate limiting
+- Code splitting
+- Lazy loading
+
+## Git Workflow
+- Commit messages: type(scope): subject
+- Branch naming: feature/xxx, bugfix/xxx
+- Atomic commits
+- Never commit secrets
+
+## AI Behavior
+- Research first, code second
+- No yapping (skip unnecessary explanations)
+- Continue working until task complete
+- Use semantic_search before grep_search
+"@
     
-    # 添加我们的标识
-    $cursorContent = "# AI Power Pack v2.4 - Cursor Rules`n# Auto-generated from awesome-cursorrules`n`n" + $cursorContent
     [System.IO.File]::WriteAllText($cursorRulesFile, $cursorContent, [System.Text.Encoding]::UTF8)
-    
     Write-Host "  ✓ .cursorrules created in current directory" -ForegroundColor Green
 } catch {
     Write-Host "  ○ Cursor Rules skipped: $($_.Exception.Message)" -ForegroundColor Gray
