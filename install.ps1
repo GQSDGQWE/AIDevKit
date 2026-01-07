@@ -71,7 +71,7 @@ if (Test-Path $claudePath) {
         }
     }
 } else {
-    Write-Host "  - Claude Desktop not found, skipping" -ForegroundColor Yellow
+    Write-Host "  ○ Claude Desktop not detected (skipping)" -ForegroundColor Gray
 }
 
 # Configure VSCode
@@ -112,17 +112,13 @@ if (Test-Path $vscodePath) {
         }
     }
 } else {
-    Write-Host "  - VSCode not found, skipping" -ForegroundColor Yellow
+    Write-Host "  ○ VSCode not detected (skipping)" -ForegroundColor Gray
 }
 
 # Install dependencies
 Write-Host ""
 Write-Host "[5/5] Installing Python dependencies..." -ForegroundColor Cyan
-$packages = @("requests", "cryptography", "pyside6", "fastapi", "sqlmodel", "uvicorn")
-foreach ($pkg in $packages) {
-    pip install $pkg -q 2>$null | Out-Null
-}
-Write-Host "  ✓ Dependencies installed" -ForegroundColor Green
+Write-Host "  ○ Skipping (only config files installed)" -ForegroundColor Gray
 
 # Cleanup
 if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
@@ -134,9 +130,14 @@ Write-Host "   Installation Complete! ✨" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📝 Next Steps:" -ForegroundColor Yellow
-Write-Host "  1. Restart Claude Desktop"
-Write-Host "  2. Restart VSCode"
-Write-Host "  3. Test: Ask Claude 'What coding standards do you follow?'"
+if (Test-Path (Join-Path $env:APPDATA "Claude")) {
+    Write-Host "  • Restart Claude Desktop to apply new rules"
+}
+if (Test-Path (Join-Path $env:APPDATA "Code\User")) {
+    Write-Host "  • Restart VSCode to apply Copilot instructions"
+}
+Write-Host ""
+Write-Host "💡 Tip: Ask Claude 'What coding standards do you follow?'" -ForegroundColor Gray
 Write-Host ""
 Write-Host "🎉 Thank you for using AI Power Pack v2.4!" -ForegroundColor Cyan
 Write-Host ""

@@ -30,7 +30,7 @@ class ConfigDeployer:
                 print(f"✓ 找到 Claude Desktop 配置: {path}")
                 return path
         
-        print("✗ 未找到 Claude Desktop 安装")
+        print("○ 未检测到 Claude Desktop（跳过配置）")
         return None
     
     def detect_vscode(self) -> Optional[Path]:
@@ -46,7 +46,7 @@ class ConfigDeployer:
                 print(f"✓ 找到 VSCode 配置: {path}")
                 return path
         
-        print("✗ 未找到 VSCode 安装")
+        print("○ 未检测到 VSCode（跳过配置）")
         return None
     
     def configure_claude(self, claude_path: Path) -> bool:
@@ -193,7 +193,7 @@ class ConfigDeployer:
         # Claude Desktop
         claude = self.results['claude']
         print(f"\n  Claude Desktop:")
-        print(f"    检测状态: {'✓ 已安装' if claude['detected'] else '✗ 未安装'}")
+        print(f"    检测状态: {'✓ 已安装' if claude['detected'] else '○ 未检测到'}")
         if claude['detected']:
             print(f"    配置路径: {claude['path']}")
             print(f"    配置状态: {'✓ 成功' if claude['configured'] else '✗ 失败'}")
@@ -201,7 +201,7 @@ class ConfigDeployer:
         # VSCode
         vscode = self.results['vscode']
         print(f"\n  VSCode:")
-        print(f"    检测状态: {'✓ 已安装' if vscode['detected'] else '✗ 未安装'}")
+        print(f"    检测状态: {'✓ 已安装' if vscode['detected'] else '○ 未检测到'}")
         if vscode['detected']:
             print(f"    配置路径: {vscode['path']}")
             print(f"    配置状态: {'✓ 成功' if vscode['configured'] else '✗ 失败'}")
@@ -214,7 +214,8 @@ class ConfigDeployer:
             print("  2. 重启 VSCode 以加载新的 Copilot 指令")
         
         if not claude['detected'] and not vscode['detected']:
-            print("  - 请先安装 Claude Desktop 或 VSCode")
+            print("  ⚠️  未检测到 Claude Desktop 或 VSCode")
+            print("  → 安装后可重新运行此工具进行配置")
 
 def main():
     deployer = ConfigDeployer()

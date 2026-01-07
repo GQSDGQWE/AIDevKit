@@ -90,7 +90,7 @@ EOF
         echo -e "${GREEN}  ✓ Claude Desktop configured${NC}"
     fi
 else
-    echo -e "${YELLOW}  - Claude Desktop not found, skipping${NC}"
+    echo -e "  ○ Claude Desktop not detected (skipping)"
 fi
 
 # Configure VSCode
@@ -135,14 +135,13 @@ EOF
         echo -e "${GREEN}  ✓ VSCode configured${NC}"
     fi
 else
-    echo -e "${YELLOW}  - VSCode not found, skipping${NC}"
+    echo -e "  ○ VSCode not detected (skipping)"
 fi
 
 # Install dependencies
 echo ""
 echo -e "${CYAN}[5/5] Installing Python dependencies...${NC}"
-$PYTHON_CMD -m pip install -q requests cryptography pyside6 fastapi sqlmodel uvicorn 2>/dev/null || true
-echo -e "${GREEN}  ✓ Dependencies installed${NC}"
+echo -e "  ○ Skipping (only config files installed)"
 
 # Cleanup
 rm -rf "$TEMP_DIR"
@@ -154,9 +153,14 @@ echo -e "${GREEN}   Installation Complete! ✨${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
 echo -e "${YELLOW}📝 Next Steps:${NC}"
-echo "  1. Restart Claude Desktop"
-echo "  2. Restart VSCode"
-echo "  3. Test: Ask Claude 'What coding standards do you follow?'"
+if [ -d "$CLAUDE_PATH" ]; then
+    echo "  • Restart Claude Desktop to apply new rules"
+fi
+if [ -d "$VSCODE_PATH" ]; then
+    echo "  • Restart VSCode to apply Copilot instructions"
+fi
+echo ""
+echo -e "💡 Tip: Ask Claude 'What coding standards do you follow?'"
 echo ""
 echo -e "${CYAN}🎉 Thank you for using AI Power Pack v2.4!${NC}"
 echo ""
