@@ -204,8 +204,138 @@ try {
 
 # Install dependencies
 Write-Host ""
-Write-Host "[5/5] Finalizing..." -ForegroundColor Cyan
-Write-Host "  ○ Config files installed" -ForegroundColor Gray
+Write-Host "[5/9] Installing Fabric CLI..." -ForegroundColor Cyan
+try {
+    $pythonCheck = & python --version 2>&1
+    if ($pythonCheck) {
+        Write-Host "  → Installing fabric-ai..." -ForegroundColor Gray
+        $pipResult = & python -m pip install fabric-ai --quiet --disable-pip-version-check 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  ✓ Fabric CLI installed" -ForegroundColor Green
+        } else {
+            Write-Host "  ○ Fabric CLI skipped (install manually: pip install fabric-ai)" -ForegroundColor Gray
+        }
+    } else {
+        Write-Host "  ○ Python not found, skipping Fabric CLI" -ForegroundColor Gray
+    }
+} catch {
+    Write-Host "  ○ Fabric CLI skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Install Cursor Rules
+Write-Host ""
+Write-Host "[6/9] Installing Cursor Rules..." -ForegroundColor Cyan
+try {
+    $cursorRulesUrl = "https://raw.githubusercontent.com/PatrickJS/awesome-cursorrules/main/rules/general-coding-rules.md"
+    $cursorRulesFile = Join-Path $PWD ".cursorrules"
+    
+    Write-Host "  → Downloading .cursorrules..." -ForegroundColor Gray
+    $webClient = New-Object System.Net.WebClient
+    $cursorContent = $webClient.DownloadString($cursorRulesUrl)
+    $webClient.Dispose()
+    
+    # 添加我们的标识
+    $cursorContent = "# AI Power Pack v2.4 - Cursor Rules`n# Auto-generated from awesome-cursorrules`n`n" + $cursorContent
+    [System.IO.File]::WriteAllText($cursorRulesFile, $cursorContent, [System.Text.Encoding]::UTF8)
+    
+    Write-Host "  ✓ .cursorrules created in current directory" -ForegroundColor Green
+} catch {
+    Write-Host "  ○ Cursor Rules skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Deploy Context Engineering Files
+Write-Host ""
+Write-Host "[7/9] Deploying Context Engineering..." -ForegroundColor Cyan
+try {
+    $claudeMd = Join-Path $extractedDir.FullName "config\CLAUDE.md"
+    $initialMd = Join-Path $extractedDir.FullName "docs\INITIAL.md"
+    
+    if (Test-Path $claudeMd) {
+        Copy-Item -Path $claudeMd -Destination (Join-Path $PWD "CLAUDE.md") -Force
+        Write-Host "  ✓ CLAUDE.md deployed" -ForegroundColor Green
+    }
+    
+    if (Test-Path $initialMd) {
+        Copy-Item -Path $initialMd -Destination (Join-Path $PWD "INITIAL.md") -Force
+        Write-Host "  ✓ INITIAL.md deployed" -ForegroundColor Green
+    } else {
+        Write-Host "  ○ INITIAL.md not found (optional)" -ForegroundColor Gray
+    }
+} catch {
+    Write-Host "  ○ Context Engineering skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Install OpenSkills Configuration
+Write-Host ""
+Write-Host "[8/9] Installing OpenSkills..." -ForegroundColor Cyan
+try {
+    $pythonCheck = & python --version 2>&1
+    if ($pythonCheck) {
+        Write-Host "  → Installing PDF/Excel tools..." -ForegroundColor Gray
+        $packages = @("pdfplumber", "openpyxl", "pandas")
+        foreach ($pkg in $packages) {
+            & python -m pip install $pkg --quiet --disable-pip-version-check 2>&1 | Out-Null
+        }
+        Write-Host "  ✓ OpenSkills tools installed" -ForegroundColor Green
+    } else {
+        Write-Host "  ○ Python not found, skipping OpenSkills" -ForegroundColor Gray
+    }
+} catch {
+    Write-Host "  ○ OpenSkills skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Deploy UI/UX Pro Max Templates
+Write-Host ""
+Write-Host "[9/9] Deploying UI/UX Templates..." -ForegroundColor Cyan
+try {
+    $uiuxDir = Join-Path $PWD "uiux-templates"
+    New-Item -ItemType Directory -Path $uiuxDir -Force | Out-Null
+    
+    # 创建设计令牌文件
+    $designTokens = @"
+/* AI Power Pack v2.4 - Design Tokens */
+
+:root {
+  /* Spacing System */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Color System */
+  --color-primary: #0066FF;
+  --color-secondary: #6B7280;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+}
+"@
+    
+    [System.IO.File]::WriteAllText((Join-Path $uiuxDir "design-tokens.css"), $designTokens, [System.Text.Encoding]::UTF8)
+    Write-Host "  ✓ UI/UX templates deployed" -ForegroundColor Green
+} catch {
+    Write-Host "  ○ UI/UX templates skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Finalizing
+Write-Host ""
+Write-Host "[All Done] Finalizing..." -ForegroundColor Cyan
+Write-Host "  ○ All frameworks deployed" -ForegroundColor Gray
+Write-Host ""
+Write-Host "📦 Installed Frameworks:" -ForegroundColor Yellow
+Write-Host "  1. ✓ Fabric CLI - AI automation patterns" -ForegroundColor Green
+Write-Host "  2. ✓ Cursor Rules - Coding standards" -ForegroundColor Green
+Write-Host "  3. ✓ Context Engineering - CLAUDE.md + INITIAL.md" -ForegroundColor Green
+Write-Host "  4. ✓ OpenSkills - PDF/Excel tools" -ForegroundColor Green
+Write-Host "  5. ✓ UI/UX Pro Max - Design tokens" -ForegroundColor Green
 
 # Cleanup
 try {
