@@ -206,14 +206,20 @@ try {
 Write-Host ""
 Write-Host "[5/9] Installing Go language..." -ForegroundColor Cyan
 try {
+    $ErrorActionPreference = 'SilentlyContinue'
     $goCheck = & go version 2>&1
+    $ErrorActionPreference = 'Continue'
+    
     if ($goCheck -match "go version") {
         Write-Host "  ✓ Go already installed: $goCheck" -ForegroundColor Green
     } else {
         Write-Host "  → Checking if Go can be installed..." -ForegroundColor Gray
         
         # 检查winget是否可用
+        $ErrorActionPreference = 'SilentlyContinue'
         $wingetCheck = & winget --version 2>&1
+        $ErrorActionPreference = 'Continue'
+        
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  → Installing Go via winget (this may take a moment)..." -ForegroundColor Gray
             
@@ -225,7 +231,10 @@ try {
                 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
                 
                 # 再次检查
+                $ErrorActionPreference = 'SilentlyContinue'
                 $goCheck = & go version 2>&1
+                $ErrorActionPreference = 'Continue'
+                
                 if ($goCheck -match "go version") {
                     Write-Host "  ✓ Go installed successfully: $goCheck" -ForegroundColor Green
                 } else {
@@ -248,9 +257,8 @@ try {
         }
     }
 } catch {
-    Write-Host "  ⚠ Go installation encountered an error" -ForegroundColor Yellow
+    Write-Host "  ⚠ Go not installed" -ForegroundColor Yellow
     Write-Host "  💡 Install Go manually: https://go.dev/dl/" -ForegroundColor Cyan
-    Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Gray
 }
 
 # Install Fabric CLI
@@ -258,7 +266,10 @@ Write-Host ""
 Write-Host "[6/9] Installing Fabric CLI..." -ForegroundColor Cyan
 try {
     # 检查Go是否安装
+    $ErrorActionPreference = 'SilentlyContinue'
     $goCheck = & go version 2>&1
+    $ErrorActionPreference = 'Continue'
+    
     if ($goCheck -match "go version") {
         Write-Host "  → Installing Fabric via Go..." -ForegroundColor Gray
         & go install github.com/danielmiessler/fabric/cmd/fabric@latest 2>&1 | Out-Null
@@ -284,10 +295,9 @@ try {
         Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
     }
 } catch {
-    Write-Host "  ⚠ Fabric CLI installation failed" -ForegroundColor Yellow
+    Write-Host "  ⚠ Fabric CLI skipped" -ForegroundColor Yellow
     Write-Host "  💡 Manual installation:" -ForegroundColor Cyan
     Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
-    Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Gray
 }
 
 # Install Cursor Rules
