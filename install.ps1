@@ -206,9 +206,7 @@ try {
 Write-Host ""
 Write-Host "[5/9] Installing Go language..." -ForegroundColor Cyan
 try {
-    $ErrorActionPreference = 'SilentlyContinue'
-    $goCheck = & go version 2>&1
-    $ErrorActionPreference = 'Continue'
+    $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
     
     if ($goCheck -match "go version") {
         Write-Host "  ✓ Go already installed: $goCheck" -ForegroundColor Green
@@ -216,11 +214,9 @@ try {
         Write-Host "  → Checking if Go can be installed..." -ForegroundColor Gray
         
         # 检查winget是否可用
-        $ErrorActionPreference = 'SilentlyContinue'
-        $wingetCheck = & winget --version 2>&1
-        $ErrorActionPreference = 'Continue'
+        $wingetCheck = & { winget --version 2>&1 } -ErrorAction SilentlyContinue
         
-        if ($LASTEXITCODE -eq 0) {
+        if ($wingetCheck) {
             Write-Host "  → Installing Go via winget (this may take a moment)..." -ForegroundColor Gray
             
             # 使用winget安装，移除--silent以避免权限问题
@@ -231,9 +227,7 @@ try {
                 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
                 
                 # 再次检查
-                $ErrorActionPreference = 'SilentlyContinue'
-                $goCheck = & go version 2>&1
-                $ErrorActionPreference = 'Continue'
+                $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
                 
                 if ($goCheck -match "go version") {
                     Write-Host "  ✓ Go installed successfully: $goCheck" -ForegroundColor Green
@@ -266,9 +260,7 @@ Write-Host ""
 Write-Host "[6/9] Installing Fabric CLI..." -ForegroundColor Cyan
 try {
     # 检查Go是否安装
-    $ErrorActionPreference = 'SilentlyContinue'
-    $goCheck = & go version 2>&1
-    $ErrorActionPreference = 'Continue'
+    $goCheck = & { go version 2>&1 } -ErrorAction SilentlyContinue
     
     if ($goCheck -match "go version") {
         Write-Host "  → Installing Fabric via Go..." -ForegroundColor Gray
