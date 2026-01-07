@@ -3,6 +3,94 @@
 > Based on 5 Battle-Tested Frameworks:
 > Fabric | Awesome Cursor Rules | Context Engineering | OpenSkills | UI/UX Pro Max
 
+## 📚 Framework References / 框架参考
+
+### 1. Fabric CLI - AI Automation Framework
+**GitHub**: https://github.com/danielmiessler/fabric
+**What We Learned / 学到了什么**:
+- Pattern-based AI workflows (extract_wisdom, summarize, etc.)
+- YouTube transcript extraction
+- Modular prompt templates
+- Multi-LLM support (OpenAI, Claude, Gemini)
+
+**Quick Start**:
+```bash
+# Install
+pip install fabric-ai
+
+# Try patterns
+fabric --pattern extract_wisdom --url https://youtube.com/watch?v=xxx
+fabric --pattern summarize < article.txt
+```
+
+### 2. Awesome Cursor Rules - Programming Standards
+**GitHub**: https://github.com/PatrickJS/awesome-cursorrules
+**Website**: https://cursor.directory
+**What We Learned / 学到了什么**:
+- Tech stack-specific `.cursorrules` files
+- Code quality enforcement through AI instructions
+- Team collaboration standards
+- Language-specific best practices
+
+**Usage**:
+- Download `.cursorrules` for your tech stack from cursor.directory
+- Place in project root
+- AI automatically follows rules when coding
+
+### 3. Context Engineering - PRP Workflow
+**Concept**: CLAUDE.md + INITIAL.md + PRP (Prompt-Review-Prompt)
+**What We Learned / 学到了什么**:
+- `CLAUDE.md`: Global project context (tech stack, standards)
+- `INITIAL.md`: Feature-specific requirements template
+- Reduce AI hallucinations by 60%+
+- Clear separation of context layers
+
+**File Structure**:
+```
+project/
+├── CLAUDE.md          # Global context
+├── INITIAL.md         # Feature template
+└── features/
+    ├── auth_INIT.md   # Auth feature context
+    └── payment_INIT.md
+```
+
+### 4. OpenSkills - AI Skills Configuration
+**Concept**: Modular skill system for AI capabilities
+**What We Learned / 学到了什么**:
+- PDF/Excel extraction skills
+- Custom skill creation (JSON-based)
+- Tool integration framework
+- Skill marketplace concept
+
+**Example Skill**:
+```json
+{
+  "name": "extract_pdf",
+  "description": "Extract text from PDF files",
+  "tools": ["pdfplumber", "PyPDF2"],
+  "workflow": ["load_pdf", "extract_text", "clean_output"]
+}
+```
+
+### 5. UI/UX Pro Max - Design System Standards
+**What We Learned / 学到了什么**:
+- Component-based design rules
+- Accessibility compliance (WCAG 2.1)
+- Design token system
+- Responsive design patterns
+- Design decision documentation
+
+**Design Tokens**:
+```css
+/* Spacing System */
+--space-xs: 4px;   /* Tight spacing */
+--space-sm: 8px;   /* Small spacing */
+--space-md: 16px;  /* Default spacing */
+--space-lg: 24px;  /* Large spacing */
+--space-xl: 32px;  /* Extra large */
+```
+
 ---
 
 ## Global Requirements (MUST FOLLOW)
@@ -219,12 +307,60 @@ Thumbs.db
 ## Context Management for Large Models / 大模型上下文管理
 
 ### For Claude (200K) & Gemini (2M)
-**Strategy: Prompt Caching + Periodic Summarization**
+**Strategy: Prompt Caching + Periodic Summarization + Auto-Summary**
+
+#### Auto-Summary Mechanism / 自动总结机制
+**Based on Anthropic's `<conversation-summary>` pattern**
+
+**Trigger Rules / 触发规则**:
+```yaml
+Auto-Summarize When:
+  - Message count > 50
+  - Token usage > 100,000
+  - Topic switch detected
+  - User says "总结一下" or "summarize"
+  - File operations > 20 in one session
+```
+
+**Summary Template / 总结模板**:
+```xml
+<conversation-summary>
+<analysis>
+  [Chronological Review] - 按时间回顾关键操作
+  [Intent Mapping] - 用户意图映射
+  [Technical Inventory] - 技术栈清单
+  [Code Archaeology] - 代码变更历史
+  [Progress Assessment] - 进度评估
+  [Context Validation] - 上下文验证
+</analysis>
+
+<summary>
+  1. Conversation Overview - 对话概览
+  2. Technical Foundation - 技术基础
+  3. Codebase Status - 代码库状态
+  4. Problem Resolution - 问题解决
+  5. Progress Tracking - 进度跟踪
+  6. Active Work State - 当前工作状态
+  7. Recent Operations - 最近操作
+  8. Continuation Plan - 后续计划
+</summary>
+</conversation-summary>
+```
+
+**Implementation / 实现方式**:
+```python
+# AI should check every 10 messages
+if message_count % 10 == 0:
+    if should_summarize():
+        generate_summary()
+        compress_history()
+```
 
 #### When to Summarize / 何时总结
 - Every 50 messages or 100K tokens
 - Before switching topics
 - When context becomes cluttered
+- After completing major milestones
 
 #### What to Keep / 保留内容
 ```yaml
@@ -238,6 +374,61 @@ Compress:
   - Historical decisions → bullet points
   - Old conversations → key outcomes
   - Code snippets → references only
+```
+
+#### Token Optimization Strategies / Token优化策略
+**Avoid Redundant File Reads / 避免重复读取**
+
+```yaml
+Before Reading Files:
+  1. Check if file content already in context
+  2. Use grep_search for overview instead of full read
+  3. Read targeted line ranges (startLine/endLine)
+  4. Batch read multiple files in parallel
+
+File Reading Priorities:
+  Priority 1: Read only changed sections
+  Priority 2: Use semantic_search for large codebases
+  Priority 3: Read file summaries before full content
+  Priority 4: Cache frequently accessed files
+```
+
+**Smart Context Loading / 智能上下文加载**:
+```python
+# ✓ GOOD - Targeted read
+read_file("app.py", startLine=50, endLine=80)
+
+# ✓ GOOD - Search first, read later
+grep_search("class UserAuth", includePattern="**/*.py")
+
+# ✓ GOOD - Batch parallel reads
+read_file("api.py") + read_file("models.py") + read_file("utils.py")
+
+# ✗ BAD - Full file read
+read_file("app.py", startLine=1, endLine=999999)
+
+# ✗ BAD - Sequential small reads
+read_file("app.py", 1, 10)
+read_file("app.py", 11, 20)
+read_file("app.py", 21, 30)
+```
+
+**Context Deduplication / 去重机制**:
+```yaml
+Before Tool Calls:
+  - Check if file already read in last 5 messages
+  - Use file modification timestamps
+  - Reference line numbers instead of re-reading
+  - Link to previous reads: "See [app.py](app.py#L50-L80) from Message #23"
+```
+
+**Estimate Before Action / 操作前评估**:
+```python
+# AI should ask itself:
+1. Do I really need to read this entire file?
+2. Can I use grep_search to locate specific sections?
+3. Is this file content already in recent context?
+4. Can I infer from file structure without reading?
 ```
 
 #### Summarization Template
@@ -471,6 +662,73 @@ def calculate_total(items: list[float], tax_rate: float = 0.1) -> float:
 - Python: Sphinx, MkDocs
 - JavaScript: JSDoc, TypeDoc
 - Auto-generate: `sphinx-apidoc`, `typedoc`
+
+---
+
+---
+
+## 📅 4-Week Mastery Plan / 4周精通计划
+
+### Week 1: Fabric CLI Mastery / Fabric CLI 精通
+**Goal**: Master AI automation patterns
+
+**Tasks / 任务**:
+- [ ] Install Fabric framework: `pip install fabric-ai`
+- [ ] Try 5-10 patterns with your content (extract_wisdom, summarize, etc.)
+- [ ] Set up API keys for your preferred LLM
+- [ ] Practice YouTube transcript extraction
+- [ ] Create 1 custom pattern for your workflow
+
+**Success Metrics / 成功指标**:
+- Can extract insights from 10+ YouTube videos
+- Created at least 1 custom pattern
+- Automated 2+ repetitive tasks
+
+### Week 2: Cursor Rules Implementation / Cursor Rules 实施
+**Goal**: Standardize coding practices
+
+**Tasks / 任务**:
+- [ ] Browse cursor.directory for your tech stack
+- [ ] Download and test 2-3 different `.cursorrules`
+- [ ] Customize rules for your project needs
+- [ ] Share with team for feedback
+- [ ] Measure code quality improvements
+
+**Success Metrics / 成功指标**:
+- Reduced code review comments by 30%+
+- Team adopted standardized rules
+- AI generates consistent code style
+
+### Week 3: Context Engineering Deployment / 上下文工程部署
+**Goal**: Reduce AI hallucinations
+
+**Tasks / 任务**:
+- [ ] Create `CLAUDE.md` with project details
+- [ ] Write `INITIAL.md` feature template
+- [ ] Test PRP workflow on a real feature
+- [ ] Measure reduction in AI hallucinations
+- [ ] Document context layers
+
+**Success Metrics / 成功指标**:
+- AI hallucinations reduced by 60%+
+- Features completed with fewer iterations
+- Clear context inheritance established
+
+### Week 4: OpenSkills + UI/UX Pro Max / 技能配置 + 设计系统
+**Goal**: Extend AI capabilities and design consistency
+
+**Tasks / 任务**:
+- [ ] Set up skills configuration (PDF/Excel extraction)
+- [ ] Create 1-2 custom skills for your workflow
+- [ ] Review design system rules (spacing, colors, typography)
+- [ ] Apply to component library
+- [ ] Test accessibility compliance (WCAG 2.1)
+- [ ] Document design decisions
+
+**Success Metrics / 成功指标**:
+- AI can process PDFs and Excel files
+- Design system enforced across 80%+ components
+- Accessibility score > 95
 
 ---
 
