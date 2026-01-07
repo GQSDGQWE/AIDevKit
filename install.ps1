@@ -252,9 +252,15 @@ if ($goCmd) {
         }
     } else {
         Write-Host "  ⚠ winget not available" -ForegroundColor Yellow
-        Write-Host "  💡 Install Go manually:" -ForegroundColor Cyan
-        Write-Host "     Download from: https://go.dev/dl/" -ForegroundColor Gray
-        Write-Host "     Or run: choco install golang (if Chocolatey installed)" -ForegroundColor Gray
+        Write-Host "  💡 Run this command to install Go:" -ForegroundColor Cyan
+        Write-Host "" -ForegroundColor Gray
+        Write-Host "     # Download and install Go automatically" -ForegroundColor DarkGray
+        Write-Host '     $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"; $goInstaller = "$env:TEMP\go-installer.msi"; Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller; Start-Process msiexec.exe -ArgumentList "/i `"$goInstaller`" /quiet" -Wait; Remove-Item $goInstaller' -ForegroundColor White
+        Write-Host "" -ForegroundColor Gray
+        Write-Host "  💡 Alternative methods:" -ForegroundColor Cyan
+        Write-Host "     • Download manually: https://go.dev/dl/" -ForegroundColor Gray
+        Write-Host "     • Use Chocolatey: choco install golang" -ForegroundColor Gray
+        Write-Host "     • Use Scoop: scoop install go" -ForegroundColor Gray
     }
 }
 
@@ -291,9 +297,12 @@ if ($goCmd) {
     }
 } else {
     Write-Host "  ⚠ Go not found, skipping Fabric CLI" -ForegroundColor Yellow
-    Write-Host "  💡 Fabric CLI requires Go language" -ForegroundColor Cyan
-    Write-Host "     Install Go first, then run:" -ForegroundColor Gray
-    Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
+    Write-Host "  💡 Install Go first with this command:" -ForegroundColor Cyan
+    Write-Host "" -ForegroundColor Gray
+    Write-Host '     $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"; $goInstaller = "$env:TEMP\go-installer.msi"; Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller; Start-Process msiexec.exe -ArgumentList "/i `"$goInstaller`" /quiet" -Wait; Remove-Item $goInstaller' -ForegroundColor White
+    Write-Host "" -ForegroundColor Gray
+    Write-Host "  💡 Then run Fabric installation:" -ForegroundColor Cyan
+    Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor White
 }
 
 # Install Cursor Rules
