@@ -206,17 +206,27 @@ try {
 Write-Host ""
 Write-Host "[5/9] Installing Fabric CLI..." -ForegroundColor Cyan
 try {
-    $pythonCheck = & python --version 2>&1
-    if ($pythonCheck) {
-        Write-Host "  → Installing fabric-ai..." -ForegroundColor Gray
-        $pipResult = & python -m pip install fabric-ai --quiet --disable-pip-version-check 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "  ✓ Fabric CLI installed" -ForegroundColor Green
+    # 检查Go是否安装
+    $goCheck = & go version 2>&1
+    if ($goCheck -match "go version") {
+        Write-Host "  → Installing Fabric via Go..." -ForegroundColor Gray
+        & go install github.com/danielmiessler/fabric/cmd/fabric@latest 2>&1 | Out-Null
+        
+        # 检查安装是否成功
+        $fabricPath = Join-Path $env:GOPATH "bin\fabric.exe"
+        if (-not $env:GOPATH) {
+            $fabricPath = Join-Path $env:USERPROFILE "go\bin\fabric.exe"
+        }
+        
+        if (Test-Path $fabricPath) {
+            Write-Host "  ✓ Fabric CLI installed successfully" -ForegroundColor Green
+            Write-Host "  ℹ Run 'fabric --setup' to configure" -ForegroundColor Gray
         } else {
-            Write-Host "  ○ Fabric CLI skipped (install manually: pip install fabric-ai)" -ForegroundColor Gray
+            Write-Host "  ○ Fabric CLI install unclear, run: go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
         }
     } else {
-        Write-Host "  ○ Python not found, skipping Fabric CLI" -ForegroundColor Gray
+        Write-Host "  ○ Go not found, skipping Fabric CLI" -ForegroundColor Gray
+        Write-Host "  ℹ Install Go from https://go.dev/doc/install" -ForegroundColor Gray
     }
 } catch {
     Write-Host "  ○ Fabric CLI skipped: $($_.Exception.Message)" -ForegroundColor Gray
@@ -226,74 +236,31 @@ try {
 Write-Host ""
 Write-Host "[6/9] Installing Cursor Rules..." -ForegroundColor Cyan
 try {
-    Write-Host "  → Creating .cursorrules..." -ForegroundColor Gray
+    Write-Host "  → Downloading .cursorrules from awesome-cursorrules..." -ForegroundColor Gray
     $cursorRulesFile = Join-Path $PWD ".cursorrules"
     
-    # 使用我们自己的Cursor规则内容
-    $cursorContent = @"
-# AI Power Pack v2.4 - Cursor Rules
-# Auto-generated cursor rules for consistent code quality
-
-## Code Quality Standards
-- Follow PLAN-EXECUTE pattern
-- Max 500 lines per file
-- Single responsibility principle
-- API-First design
-
-## File Organization
-- Feature-based grouping (not file type)
-- api/, sdk/, gui/ structure
-- Clear naming conventions
-
-## Naming Conventions
-- Classes: PascalCase
-- Functions: camelCase
-- Constants: UPPER_SNAKE_CASE
-- Files: kebab-case
-
-## Documentation
-- JSDoc/docstring for all public APIs
-- README.md in each major module
-- Inline comments for complex logic
-
-## Testing
-- Unit tests for all business logic
-- Integration tests for APIs
-- E2E tests for critical paths
-- Test coverage > 80%
-
-## Security
-- Input validation on all endpoints
-- SQL injection prevention
-- XSS prevention
-- CSRF tokens
-- HTTPS only
-
-## Performance
-- Database indexing
-- Query optimization
-- Caching strategy
-- Rate limiting
-- Code splitting
-- Lazy loading
-
-## Git Workflow
-- Commit messages: type(scope): subject
-- Branch naming: feature/xxx, bugfix/xxx
-- Atomic commits
-- Never commit secrets
-
-## AI Behavior
-- Research first, code second
-- No yapping (skip unnecessary explanations)
-- Continue working until task complete
-- Use semantic_search before grep_search
-"@
+    # 使用通用的TypeScript/JavaScript规则
+    $cursorRulesUrl = "https://raw.githubusercontent.com/PatrickJS/awesome-cursorrules/main/rules/javascript-typescript-code-quality-cursorrules-pro/.cursorrules"
     
+    $webClient = New-Object System.Net.WebClient
+    $cursorContent = $webClient.DownloadString($cursorRulesUrl)
+    $webClient.Dispose()
+    
+    # 添加我们的标识
+    $header = @"
+# AI Power Pack v2.4 - Cursor Rules
+# Source: awesome-cursorrules
+# https://github.com/PatrickJS/awesome-cursorrules
+
+"@
+    $cursorContent = $header + $cursorContent
     [System.IO.File]::WriteAllText($cursorRulesFile, $cursorContent, [System.Text.Encoding]::UTF8)
+    
     Write-Host "  ✓ .cursorrules created in current directory" -ForegroundColor Green
+    Write-Host "  ℹ Sourced from: awesome-cursorrules" -ForegroundColor Gray
 } catch {
-    Write-Host "  ○ Cursor Rules skipped: $($_.Exception.Message)" -ForegroundColor Gray
+    Write-Host "  ○ Cursor Rules download failed: $($_.Exception.Message)" -ForegroundColor Gray
+    Write-Host "  ℹ Visit https://cursor.directory for manual download" -ForegroundColor Gray
 }
 
 # Deploy Context Engineering Files
