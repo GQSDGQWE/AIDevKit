@@ -5,12 +5,42 @@
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
+# 超时执行函数（防止卡住）
+function Invoke-WithTimeout {
+    param(
+        [ScriptBlock]$ScriptBlock,
+        [int]$TimeoutSeconds = 10
+    )
+    
+    $job = Start-Job -ScriptBlock $ScriptBlock
+    $completed = Wait-Job -Job $job -Timeout $TimeoutSeconds
+    
+    if ($completed) {
+        $result = Receive-Job -Job $job
+        Remove-Job -Job $job -Force
+        return $result
+    } else {
+        Remove-Job -Job $job -Force
+        throw "Operation timed out after $TimeoutSeconds seconds"
+    }
+}
+
+# Check if running as administrator
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+$isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "   AI Power Pack v2.4" -ForegroundColor Yellow
 Write-Host "   Remote Installer" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
+
+if (-not $isAdmin) {
+    Write-Host "Note: Not running as administrator" -ForegroundColor Yellow
+    Write-Host "      Some operations may require admin rights" -ForegroundColor Gray
+    Write-Host ""
+}
 
 # Check Python (optional)
 Write-Host "[1/5] Checking Python..." -ForegroundColor Cyan
@@ -64,11 +94,30 @@ try {
     if (Test-Path $claudePath) {
         $claudeMd = Join-Path $extractedDir.FullName "config\CLAUDE.md"
         if (Test-Path $claudeMd) {
+            Write-Host "  → Reading config file..." -ForegroundColor Gray
             $configFile = Join-Path $claudePath "claude_desktop_config.json"
-            $content = Get-Content -Path $claudeMd -Encoding UTF8 -Raw
             
-            # 简单的 JSON 字符串构造，避免 ConvertTo-Json 问题
-            $escapedContent = $content -replace '\\', '\\' -replace '"', '\"' -replace "`r`n", '\n' -replace "`n", '\n'
+            # 确保目录存在且可写
+            if (-not (Test-Path $claudePath)) {
+                New-Item -ItemType Directory -Path $claudePath -Force | Out-Null
+            }
+            
+            # 测试写入权限
+            $testFile = Join-Path $claudePath "test_write.tmp"
+            try {
+                [System.IO.File]::WriteAllText($testFile, "test", [System.Text.Encoding]::UTF8)
+                Remove-Item $testFile -Force -ErrorAction SilentlyContinue
+            } catch {
+                Write-Host "  ○ No write permission to Claude folder (skipping)" -ForegroundColor Gray
+                throw "No write permission"
+            }
+            
+            Write-Host "  → Creating configuration..." -ForegroundColor Gray
+            $content = [System.IO.File]::ReadAllText($claudeMd, [System.Text.Encoding]::UTF8)
+            
+            # 转义特殊字符
+            $escapedContent = $content -replace '\\', '\\' -replace '"', '\"' -replace "`r", '' -replace "`n", '\n' -replace "`t", '\t'
+            
             $jsonContent = @"
 {
   "customInstructions": {
@@ -79,6 +128,7 @@ try {
 }
 "@
             
+            Write-Host "  → Writing to $configFile..." -ForegroundColor Gray
             [System.IO.File]::WriteAllText($configFile, $jsonContent, [System.Text.Encoding]::UTF8)
             Write-Host "  ✓ Claude Desktop configured" -ForegroundColor Green
         } else {
@@ -100,10 +150,23 @@ try {
     if (Test-Path $vscodePath) {
         $copilotMd = Join-Path $extractedDir.FullName "config\copilot-instructions.md"
         if (Test-Path $copilotMd) {
+            Write-Host "  → Copying config file..." -ForegroundColor Gray
+            
+            # 测试写入权限
+            $testFile = Join-Path $vscodePath "test_write.tmp"
+            try {
+                [System.IO.File]::WriteAllText($testFile, "test", [System.Text.Encoding]::UTF8)
+                Remove-Item $testFile -Force -ErrorAction SilentlyContinue
+            } catch {
+                Write-Host "  ○ No write permission to VSCode folder (skipping)" -ForegroundColor Gray
+                throw "No write permission"
+            }
+            
             # 复制配置文件
             $destPath = Join-Path $vscodePath "copilot-instructions.md"
             Copy-Item -Path $copilotMd -Destination $destPath -Force
             
+            Write-Host "  → Updating settings..." -ForegroundColor Gray
             # 更新 settings.json
             $settingsFile = Join-Path $vscodePath "settings.json"
             $settingsContent = @"
