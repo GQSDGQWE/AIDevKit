@@ -1,6 +1,9 @@
 ﻿#!/usr/bin/env pwsh
 # AI Power Pack v2.4 - Remote Installer
-# Usage: iwr -useb https://raw.githubusercontent.com/YOUR_USERNAME/REPO_NAME/main/install.ps1 | iex
+# Usage: iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
+
+$ErrorActionPreference = 'SilentlyContinue'
+$ProgressPreference = 'SilentlyContinue'
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -9,38 +12,46 @@ Write-Host "   Remote Installer" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Check Python
+# Check Python (optional)
 Write-Host "[1/5] Checking Python..." -ForegroundColor Cyan
 try {
-    $pythonVersion = python --version 2>&1
-    Write-Host "  ✓ Python installed: $pythonVersion" -ForegroundColor Green
+    $pythonCheck = & python --version 2>&1
+    if ($pythonCheck) {
+        Write-Host "  ✓ Python detected" -ForegroundColor Green
+    } else {
+        Write-Host "  ○ Python not detected (optional)" -ForegroundColor Gray
+    }
 } catch {
-    Write-Host "  ✗ Python not installed" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "Please install Python 3.8+ from:" -ForegroundColor Yellow
-    Write-Host "https://www.python.org/downloads/" -ForegroundColor Yellow
-    exit 1
+    Write-Host "  ○ Python not detected (optional)" -ForegroundColor Gray
 }
 
 # Download package
 Write-Host ""
 Write-Host "[2/5] Downloading AI Power Pack..." -ForegroundColor Cyan
-$tempDir = Join-Path $env:TEMP "ai_power_pack"
+$tempDir = Join-Path $env:TEMP "ai_power_pack_$(Get-Random)"
 $zipUrl = "https://github.com/GQSDGQWE/AIDevKit/archive/refs/heads/main.zip"
 
 try {
-    if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
-    New-Item -ItemType Directory -Path $tempDir | Out-Null
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     
     $zipFile = Join-Path $tempDir "package.zip"
-    Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile -UseBasicParsing
+    Write-Host "  → Downloading from GitHub..." -ForegroundColor Gray
     
+    # 使用 WebClient 更可靠
+    $webClient = New-Object System.Net.WebClient
+    $webClient.DownloadFile($zipUrl, $zipFile)
+    $webClient.Dispose()
+    
+    Write-Host "  → Extracting..." -ForegroundColor Gray
     Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
     $extractedDir = Get-ChildItem $tempDir -Directory | Select-Object -First 1
     
     Write-Host "  ✓ Package downloaded" -ForegroundColor Green
 } catch {
-    Write-Host "  ✗ Download failed: $_" -ForegroundColor Red
+    Write-Host "  ✗ Download failed: $($_.Exception.Message)" -ForegroundColor Red
+    if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue }
+    Write-Host ""
+    Write-Host "Please check your internet connection and try again." -ForegroundColor Yellow
     exit 1
 }
 
@@ -48,80 +59,99 @@ try {
 Write-Host ""
 Write-Host "[3/5] Configuring Claude Desktop..." -ForegroundColor Cyan
 $claudePath = Join-Path $env:APPDATA "Claude"
-if (Test-Path $claudePath) {
-    $claudeMd = Join-Path $extractedDir.FullName "config\CLAUDE.md"
-    if (Test-Path $claudeMd) {
-        try {
+
+try {
+    if (Test-Path $claudePath) {
+        $claudeMd = Join-Path $extractedDir.FullName "config\CLAUDE.md"
+        if (Test-Path $claudeMd) {
             $configFile = Join-Path $claudePath "claude_desktop_config.json"
             $content = Get-Content -Path $claudeMd -Encoding UTF8 -Raw
             
-            $config = @{
-                customInstructions = @{
-                    global = $content
-                    version = "2.4"
-                    source = "github"
-                    installed = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-                }
-            }
+            # 简单的 JSON 字符串构造，避免 ConvertTo-Json 问题
+            $escapedContent = $content -replace '\\', '\\' -replace '"', '\"' -replace "`r`n", '\n' -replace "`n", '\n'
+            $jsonContent = @"
+{
+  "customInstructions": {
+    "global": "$escapedContent",
+    "version": "2.4",
+    "source": "github"
+  }
+}
+"@
             
-            $config | ConvertTo-Json -Depth 10 | Set-Content -Path $configFile -Encoding UTF8
+            [System.IO.File]::WriteAllText($configFile, $jsonContent, [System.Text.Encoding]::UTF8)
             Write-Host "  ✓ Claude Desktop configured" -ForegroundColor Green
-        } catch {
-            Write-Host "  ✗ Failed: $_" -ForegroundColor Red
+        } else {
+            Write-Host "  ○ Config file not found (skipping)" -ForegroundColor Gray
         }
+    } else {
+        Write-Host "  ○ Claude Desktop not detected (skipping)" -ForegroundColor Gray
     }
-} else {
-    Write-Host "  ○ Claude Desktop not detected (skipping)" -ForegroundColor Gray
+} catch {
+    Write-Host "  ○ Claude config skipped: $($_.Exception.Message)" -ForegroundColor Gray
 }
 
 # Configure VSCode
 Write-Host ""
 Write-Host "[4/5] Configuring VSCode..." -ForegroundColor Cyan
 $vscodePath = Join-Path $env:APPDATA "Code\User"
-if (Test-Path $vscodePath) {
-    $copilotMd = Join-Path $extractedDir.FullName "config\copilot-instructions.md"
-    if (Test-Path $copilotMd) {
-        try {
+
+try {
+    if (Test-Path $vscodePath) {
+        $copilotMd = Join-Path $extractedDir.FullName "config\copilot-instructions.md"
+        if (Test-Path $copilotMd) {
+            # 复制配置文件
             $destPath = Join-Path $vscodePath "copilot-instructions.md"
             Copy-Item -Path $copilotMd -Destination $destPath -Force
             
+            # 更新 settings.json
             $settingsFile = Join-Path $vscodePath "settings.json"
+            $settingsContent = @"
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "copilot-instructions.md",
+      "text": "Follow AI Power Pack v2.4 standards"
+    }
+  ],
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true
+  }
+}
+"@
+            
+            # 如果已有 settings.json，备份
             if (Test-Path $settingsFile) {
-                $settings = Get-Content $settingsFile -Raw | ConvertFrom-Json
-            } else {
-                $settings = @{}
+                Copy-Item -Path $settingsFile -Destination "$settingsFile.backup" -Force -ErrorAction SilentlyContinue
             }
             
-            $settings | Add-Member -NotePropertyName "github.copilot.chat.codeGeneration.instructions" -NotePropertyValue @(
-                @{
-                    file = $destPath
-                    text = "Follow AI Power Pack v2.4 standards"
-                }
-            ) -Force
-            
-            $settings | Add-Member -NotePropertyName "github.copilot.enable" -NotePropertyValue @{
-                "*" = $true
-                plaintext = $true
-                markdown = $true
-            } -Force
-            
-            $settings | ConvertTo-Json -Depth 10 | Set-Content -Path $settingsFile -Encoding UTF8
+            [System.IO.File]::WriteAllText($settingsFile, $settingsContent, [System.Text.Encoding]::UTF8)
             Write-Host "  ✓ VSCode configured" -ForegroundColor Green
-        } catch {
-            Write-Host "  ✗ Failed: $_" -ForegroundColor Red
+        } else {
+            Write-Host "  ○ Config file not found (skipping)" -ForegroundColor Gray
         }
+    } else {
+        Write-Host "  ○ VSCode not detected (skipping)" -ForegroundColor Gray
     }
-} else {
-    Write-Host "  ○ VSCode not detected (skipping)" -ForegroundColor Gray
+} catch {
+    Write-Host "  ○ VSCode config skipped: $($_.Exception.Message)" -ForegroundColor Gray
 }
 
 # Install dependencies
 Write-Host ""
-Write-Host "[5/5] Installing Python dependencies..." -ForegroundColor Cyan
-Write-Host "  ○ Skipping (only config files installed)" -ForegroundColor Gray
+Write-Host "[5/5] Finalizing..." -ForegroundColor Cyan
+Write-Host "  ○ Config files installed" -ForegroundColor Gray
 
 # Cleanup
-if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+try {
+    if (Test-Path $tempDir) { 
+        Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue 
+    }
+} catch {
+    # Ignore cleanup errors
+}
 
 # Complete
 Write-Host ""
