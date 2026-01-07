@@ -202,9 +202,44 @@ try {
     Write-Host "  ○ VSCode config skipped: $($_.Exception.Message)" -ForegroundColor Gray
 }
 
-# Install dependencies
+# Install Go language
 Write-Host ""
-Write-Host "[5/9] Installing Fabric CLI..." -ForegroundColor Cyan
+Write-Host "[5/9] Installing Go language..." -ForegroundColor Cyan
+try {
+    $goCheck = & go version 2>&1
+    if ($goCheck -match "go version") {
+        Write-Host "  ✓ Go already installed: $goCheck" -ForegroundColor Green
+    } else {
+        Write-Host "  → Installing Go via winget..." -ForegroundColor Gray
+        
+        # 尝试使用winget安装
+        $wingetCheck = & winget --version 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            & winget install --id GoLang.Go --silent --accept-package-agreements --accept-source-agreements 2>&1 | Out-Null
+            
+            # 刷新环境变量
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+            
+            # 再次检查
+            $goCheck = & go version 2>&1
+            if ($goCheck -match "go version") {
+                Write-Host "  ✓ Go installed successfully: $goCheck" -ForegroundColor Green
+            } else {
+                Write-Host "  ○ Go installation completed, but 'go' command not found" -ForegroundColor Yellow
+                Write-Host "  ℹ Please restart your terminal and run: go version" -ForegroundColor Gray
+            }
+        } else {
+            Write-Host "  ○ winget not available, skipping Go installation" -ForegroundColor Gray
+            Write-Host "  ℹ Install Go manually: https://go.dev/doc/install" -ForegroundColor Gray
+        }
+    }
+} catch {
+    Write-Host "  ○ Go installation skipped: $($_.Exception.Message)" -ForegroundColor Gray
+}
+
+# Install Fabric CLI
+Write-Host ""
+Write-Host "[6/9] Installing Fabric CLI..." -ForegroundColor Cyan
 try {
     # 检查Go是否安装
     $goCheck = & go version 2>&1
@@ -234,7 +269,7 @@ try {
 
 # Install Cursor Rules
 Write-Host ""
-Write-Host "[6/9] Installing Cursor Rules..." -ForegroundColor Cyan
+Write-Host "[7/9] Installing Cursor Rules..." -ForegroundColor Cyan
 try {
     Write-Host "  → Downloading .cursorrules from awesome-cursorrules..." -ForegroundColor Gray
     $cursorRulesFile = Join-Path $PWD ".cursorrules"
@@ -265,7 +300,7 @@ try {
 
 # Deploy Context Engineering Files
 Write-Host ""
-Write-Host "[7/9] Deploying Context Engineering..." -ForegroundColor Cyan
+Write-Host "[8/9] Deploying Context Engineering..." -ForegroundColor Cyan
 try {
     $claudeMd = Join-Path $extractedDir.FullName "config\CLAUDE.md"
     $initialMd = Join-Path $extractedDir.FullName "docs\INITIAL.md"
@@ -287,7 +322,7 @@ try {
 
 # Install OpenSkills Configuration
 Write-Host ""
-Write-Host "[8/9] Installing OpenSkills..." -ForegroundColor Cyan
+Write-Host "[9/9] Installing OpenSkills..." -ForegroundColor Cyan
 try {
     $pythonCheck = & python --version 2>&1
     if ($pythonCheck) {
@@ -306,7 +341,7 @@ try {
 
 # Deploy UI/UX Pro Max Templates
 Write-Host ""
-Write-Host "[9/9] Deploying UI/UX Templates..." -ForegroundColor Cyan
+Write-Host "[10/10] Deploying UI/UX Templates..." -ForegroundColor Cyan
 try {
     $uiuxDir = Join-Path $PWD "uiux-templates"
     New-Item -ItemType Directory -Path $uiuxDir -Force | Out-Null
@@ -350,12 +385,13 @@ Write-Host ""
 Write-Host "[All Done] Finalizing..." -ForegroundColor Cyan
 Write-Host "  ○ All frameworks deployed" -ForegroundColor Gray
 Write-Host ""
-Write-Host "📦 Installed Frameworks:" -ForegroundColor Yellow
-Write-Host "  1. ✓ Fabric CLI - AI automation patterns" -ForegroundColor Green
-Write-Host "  2. ✓ Cursor Rules - Coding standards" -ForegroundColor Green
-Write-Host "  3. ✓ Context Engineering - CLAUDE.md + INITIAL.md" -ForegroundColor Green
-Write-Host "  4. ✓ OpenSkills - PDF/Excel tools" -ForegroundColor Green
-Write-Host "  5. ✓ UI/UX Pro Max - Design tokens" -ForegroundColor Green
+Write-Host "📦 Installed Components:" -ForegroundColor Yellow
+Write-Host "  1. ✓ Go Language - Programming environment" -ForegroundColor Green
+Write-Host "  2. ✓ Fabric CLI - AI automation patterns" -ForegroundColor Green
+Write-Host "  3. ✓ Cursor Rules - Coding standards" -ForegroundColor Green
+Write-Host "  4. ✓ Context Engineering - CLAUDE.md + INITIAL.md" -ForegroundColor Green
+Write-Host "  5. ✓ OpenSkills - PDF/Excel tools" -ForegroundColor Green
+Write-Host "  6. ✓ UI/UX Pro Max - Design tokens" -ForegroundColor Green
 
 # Cleanup
 try {
