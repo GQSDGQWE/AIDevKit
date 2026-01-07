@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # AI Power Pack v2.4 - Remote Installer
 # Usage: iwr -useb https://raw.githubusercontent.com/YOUR_USERNAME/REPO_NAME/main/install.ps1 | iex
 
@@ -26,7 +26,7 @@ try {
 Write-Host ""
 Write-Host "[2/5] Downloading AI Power Pack..." -ForegroundColor Cyan
 $tempDir = Join-Path $env:TEMP "ai_power_pack"
-$zipUrl = "https://github.com/Buxiaomaomaozi/CONSOL/archive/refs/heads/main.zip"
+$zipUrl = "https://github.com/GQSDGQWE/AIDevKit/archive/refs/heads/main.zip"
 
 try {
     if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }

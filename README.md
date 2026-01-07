@@ -1,4 +1,4 @@
-# 🚀 AI Power Pack v2.4 - Professional AI Development Framework
+﻿# 🚀 AI Power Pack v2.4 - Professional AI Development Framework
 
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-v2.4.0-orange.svg)](CHANGELOG)
@@ -10,12 +10,12 @@
 
 ### Windows (PowerShell)
 ```powershell
-iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 ```
 
 ### macOS / Linux (Bash)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.sh | bash
 ```
 
 ### 安装后操作

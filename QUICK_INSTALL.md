@@ -4,12 +4,12 @@
 
 ### Windows (PowerShell)
 ```powershell
-iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 ```
 
 ### macOS / Linux (Bash)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.sh | bash
 ```
 
 ---
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.
 1. 按 `Win + X`，选择 "Windows PowerShell (管理员)"
 2. 复制粘贴以下命令：
 ```powershell
-iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 ```
 3. 按回车执行
 
@@ -32,7 +32,7 @@ iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.p
 1. 打开终端
 2. 复制粘贴以下命令：
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.sh | bash
 ```
 3. 按回车执行
 
@@ -75,7 +75,7 @@ curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.
 ### 方式 1：克隆仓库
 ```bash
 # 克隆项目
-git clone https://github.com/Buxiaomaomaozi/CONSOL.git
+git clone https://github.com/GQSDGQWE/AIDevKit.git
 cd REPO_NAME
 
 # Windows
@@ -86,7 +86,7 @@ python3 tools/deploy_config.py
 ```
 
 ### 方式 2：下载 ZIP
-1. 访问 [GitHub 仓库](https://github.com/Buxiaomaomaozi/CONSOL)
+1. 访问 [GitHub 仓库](https://github.com/GQSDGQWE/AIDevKit)
 2. 点击 "Code" → "Download ZIP"
 3. 解压后运行 `INSTALL.bat` (Windows) 或 `install.py` (macOS/Linux)
 
@@ -120,12 +120,12 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 
 **jsdelivr CDN (Windows):**
 ```powershell
-iwr -useb https://cdn.jsdelivr.net/gh/Buxiaomaomaozi/CONSOL@main/install.ps1 | iex
+iwr -useb https://cdn.jsdelivr.net/gh/GQSDGQWE/AIDevKit@main/install.ps1 | iex
 ```
 
 **jsdelivr CDN (macOS/Linux):**
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/Buxiaomaomaozi/CONSOL@main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/GQSDGQWE/AIDevKit@main/install.sh | bash
 ```
 
 ---
@@ -149,22 +149,22 @@ curl -fsSL https://cdn.jsdelivr.net/gh/Buxiaomaomaozi/CONSOL@main/install.sh | b
 
 ```powershell
 # Windows
-iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 ```
 
 ```bash
 # macOS/Linux
-curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.sh | bash
 ```
 
 ---
 
 ## 📚 更多信息
 
-- **GitHub 仓库**: https://github.com/Buxiaomaomaozi/CONSOL
+- **GitHub 仓库**: https://github.com/GQSDGQWE/AIDevKit
 - **详细文档**: [README.md](README.md)
 - **部署指南**: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
-- **问题反馈**: [GitHub Issues](https://github.com/Buxiaomaomaozi/CONSOL/issues)
+- **问题反馈**: [GitHub Issues](https://github.com/GQSDGQWE/AIDevKit/issues)
 
 ---
 
@@ -186,12 +186,12 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ```powershell
 # Windows
-iwr -useb https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 ```
 
 ```bash
 # macOS/Linux
-curl -fsSL https://raw.githubusercontent.com/Buxiaomaomaozi/CONSOL/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.sh | bash
 ```
 
 ---

@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # AI Power Pack v2.4 - Remote Installer for Linux/macOS
 # Usage: curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/REPO_NAME/main/install.sh | bash
 
@@ -40,7 +40,7 @@ fi
 echo ""
 echo -e "${CYAN}[2/5] Downloading AI Power Pack...${NC}"
 TEMP_DIR="/tmp/ai_power_pack"
-ZIP_URL="https://github.com/Buxiaomaomaozi/CONSOL/archive/refs/heads/main.zip"
+ZIP_URL="https://github.com/GQSDGQWE/AIDevKit/archive/refs/heads/main.zip"
 
 rm -rf "$TEMP_DIR"
 mkdir -p "$TEMP_DIR"
