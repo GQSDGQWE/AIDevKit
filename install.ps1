@@ -1,9 +1,12 @@
 ﻿#!/usr/bin/env pwsh
-# AI Power Pack v2.4 - Remote Installer
+# AI Power Pack v1.0 - Remote Installer
 # Usage: iwr -useb https://raw.githubusercontent.com/GQSDGQWE/AIDevKit/main/install.ps1 | iex
 
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
+
+# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 # 超时执行函数（防止卡住）
 function Invoke-WithTimeout {
@@ -31,7 +34,7 @@ $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::A
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   AI Power Pack v2.4" -ForegroundColor Yellow
+Write-Host "   AI Power Pack v1.0" -ForegroundColor Yellow
 Write-Host "   Remote Installer" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
@@ -122,7 +125,7 @@ try {
 {
   "customInstructions": {
     "global": "$escapedContent",
-    "version": "2.4",
+    "version": "1.0",
     "source": "github"
   }
 }
@@ -174,7 +177,7 @@ try {
   "github.copilot.chat.codeGeneration.instructions": [
     {
       "file": "copilot-instructions.md",
-      "text": "Follow AI Power Pack v2.4 standards"
+      "text": "Follow AI Power Pack v1.0 standards"
     }
   ],
   "github.copilot.enable": {
@@ -206,13 +209,17 @@ try {
 Write-Host ""
 Write-Host "[5/9] Installing Go language..." -ForegroundColor Cyan
 
+# 全局变量用于存储Go路径
+$global:GoExecutable = $null
+
 # 检查Go是否已安装
 $goCmd = Get-Command go -ErrorAction SilentlyContinue
 if ($goCmd) {
     $goVersion = & go version 2>&1
     Write-Host "  ✓ Go already installed: $goVersion" -ForegroundColor Green
+    $global:GoExecutable = "go"
 } else {
-    Write-Host "  → Go not found, attempting installation..." -ForegroundColor Gray
+    Write-Host "  → Go not found, starting automatic installation..." -ForegroundColor Gray
     
     # 检查winget是否可用
     $wingetCmd = Get-Command winget -ErrorAction SilentlyContinue
@@ -221,7 +228,7 @@ if ($goCmd) {
         Write-Host "  → Installing Go via winget (this may take a moment)..." -ForegroundColor Gray
         
         try {
-            # 使用winget安装，移除--silent以避免权限问题
+            # 使用winget安装
             & winget install --id GoLang.Go --accept-package-agreements --accept-source-agreements 2>&1 | Out-Null
             
             if ($LASTEXITCODE -eq 0) {
@@ -236,31 +243,119 @@ if ($goCmd) {
                     Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
                 } else {
                     Write-Host "  ⚠ Go installation completed, but requires terminal restart" -ForegroundColor Yellow
-                    Write-Host "  💡 Please close and reopen your terminal, then run:" -ForegroundColor Cyan
-                    Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
                 }
             } else {
-                Write-Host "  ⚠ Go installation via winget failed" -ForegroundColor Yellow
-                Write-Host "  💡 Manual installation options:" -ForegroundColor Cyan
-                Write-Host "     Option 1: Run PowerShell as administrator and retry" -ForegroundColor Gray
-                Write-Host "     Option 2: Download from https://go.dev/dl/" -ForegroundColor Gray
-                Write-Host "     Option 3: Run: winget install GoLang.Go" -ForegroundColor Gray
+                throw "winget installation failed"
             }
         } catch {
-            Write-Host "  ⚠ Go installation error" -ForegroundColor Yellow
-            Write-Host "  💡 Install Go manually: https://go.dev/dl/" -ForegroundColor Cyan
+            Write-Host "  → winget failed, trying MSI installer..." -ForegroundColor Gray
+            
+            # Fallback: 使用MSI安装器
+            try {
+                $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"
+                $goInstaller = "$env:TEMP\go-installer.msi"
+                
+                Write-Host "  → Downloading Go installer..." -ForegroundColor Gray
+                Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller -UseBasicParsing
+                
+                Write-Host "  → Installing Go (this may take 1-2 minutes)..." -ForegroundColor Gray
+                $installProcess = Start-Process msiexec.exe -ArgumentList "/i", "`"$goInstaller`"", "/qn", "/norestart" -Wait -NoNewWindow -PassThru
+                
+                if ($installProcess.ExitCode -eq 0) {
+                    Write-Host "  → Go installation completed successfully" -ForegroundColor Green
+                } elseif ($installProcess.ExitCode -eq 1603) {
+                    Write-Host "  ✗ Installation failed: requires administrator privileges" -ForegroundColor Red
+                    Write-Host "  💡 Please run PowerShell as Administrator and try again" -ForegroundColor Cyan
+                    Write-Host "     OR install manually from: https://go.dev/dl/" -ForegroundColor Gray
+                    Remove-Item $goInstaller -ErrorAction SilentlyContinue
+                    continue
+                } else {
+                    Write-Host "  ⚠ Installation completed with exit code: $($installProcess.ExitCode)" -ForegroundColor Yellow
+                }
+                
+                # 清理安装文件
+                Remove-Item $goInstaller -ErrorAction SilentlyContinue
+                
+                # 刷新环境变量
+                $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+                
+                # 检查安装结果
+                $goCmd = Get-Command go -ErrorAction SilentlyContinue
+                
+                if ($goCmd) {
+                    $goVersion = & go version 2>&1
+                    Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
+                    $global:GoExecutable = "go"
+                } else {
+                    # 尝试查找Go的默认安装路径
+                    $defaultGoPath = "C:\Program Files\Go\bin\go.exe"
+                    if (Test-Path $defaultGoPath) {
+                        $global:GoExecutable = $defaultGoPath
+                        $goVersion = & $defaultGoPath version 2>&1
+                        Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
+                    } else {
+                        Write-Host "  ✓ Go installed, but requires terminal restart" -ForegroundColor Yellow
+                    }
+                }
+            } catch {
+                Write-Host "  ✗ Automatic installation failed" -ForegroundColor Red
+                Write-Host "  💡 Please install manually: https://go.dev/dl/" -ForegroundColor Cyan
+            }
         }
     } else {
-        Write-Host "  ⚠ winget not available" -ForegroundColor Yellow
-        Write-Host "  💡 Run this command to install Go:" -ForegroundColor Cyan
-        Write-Host "" -ForegroundColor Gray
-        Write-Host "     # Download and install Go automatically" -ForegroundColor DarkGray
-        Write-Host '     $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"; $goInstaller = "$env:TEMP\go-installer.msi"; Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller; Start-Process msiexec.exe -ArgumentList "/i `"$goInstaller`" /quiet" -Wait; Remove-Item $goInstaller' -ForegroundColor White
-        Write-Host "" -ForegroundColor Gray
-        Write-Host "  💡 Alternative methods:" -ForegroundColor Cyan
-        Write-Host "     • Download manually: https://go.dev/dl/" -ForegroundColor Gray
-        Write-Host "     • Use Chocolatey: choco install golang" -ForegroundColor Gray
-        Write-Host "     • Use Scoop: scoop install go" -ForegroundColor Gray
+        # winget不可用，直接使用MSI安装器
+        Write-Host "  → Using MSI installer..." -ForegroundColor Gray
+        
+        try {
+            $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"
+            $goInstaller = "$env:TEMP\go-installer.msi"
+            
+            Write-Host "  → Downloading Go installer..." -ForegroundColor Gray
+            Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller -UseBasicParsing
+            
+            Write-Host "  → Installing Go (this may take 1-2 minutes)..." -ForegroundColor Gray
+            $installProcess = Start-Process msiexec.exe -ArgumentList "/i", "`"$goInstaller`"", "/qn", "/norestart" -Wait -NoNewWindow -PassThru
+            
+            if ($installProcess.ExitCode -eq 0) {
+                Write-Host "  → Go installation completed successfully" -ForegroundColor Green
+            } elseif ($installProcess.ExitCode -eq 1603) {
+                Write-Host "  ✗ Installation failed: requires administrator privileges" -ForegroundColor Red
+                Write-Host "  💡 Please run PowerShell as Administrator and try again" -ForegroundColor Cyan
+                Write-Host "     OR install manually from: https://go.dev/dl/" -ForegroundColor Gray
+                Remove-Item $goInstaller -ErrorAction SilentlyContinue
+                return
+            } else {
+                Write-Host "  ⚠ Installation completed with exit code: $($installProcess.ExitCode)" -ForegroundColor Yellow
+            }
+            
+            # 清理安装文件
+            Remove-Item $goInstaller -ErrorAction SilentlyContinue
+            
+            # 刷新环境变量
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+            
+            # 检查安装结果
+            $goCmd = Get-Command go -ErrorAction SilentlyContinue
+            
+            if ($goCmd) {
+                $goVersion = & go version 2>&1
+                Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
+                $global:GoExecutable = "go"
+            } else {
+                # 尝试查找Go的默认安装路径
+                $defaultGoPath = "C:\Program Files\Go\bin\go.exe"
+                if (Test-Path $defaultGoPath) {
+                    $global:GoExecutable = $defaultGoPath
+                    $goVersion = & $defaultGoPath version 2>&1
+                    Write-Host "  ✓ Go installed successfully: $goVersion" -ForegroundColor Green
+                } else {
+                    Write-Host "  ✓ Go installed, but requires terminal restart" -ForegroundColor Yellow
+                }
+            }
+        } catch {
+            Write-Host "  ✗ Automatic installation failed" -ForegroundColor Red
+            Write-Host "  💡 Please install manually: https://go.dev/dl/" -ForegroundColor Cyan
+        }
     }
 }
 
@@ -268,13 +363,37 @@ if ($goCmd) {
 Write-Host ""
 Write-Host "[6/9] Installing Fabric CLI..." -ForegroundColor Cyan
 
-# 检查Go是否安装
-$goCmd = Get-Command go -ErrorAction SilentlyContinue
+# 使用全局变量中的Go路径或尝试检测
+if (-not $global:GoExecutable) {
+    # 首先尝试通过常规方式检查Go
+    $goCmd = Get-Command go -ErrorAction SilentlyContinue
+    if ($goCmd) {
+        $global:GoExecutable = "go"
+    } else {
+        # 如果常规方式找不到，尝试直接使用完整路径
+        $possiblePaths = @(
+            "C:\Program Files\Go\bin\go.exe",
+            "$env:ProgramFiles\Go\bin\go.exe",
+            "${env:ProgramFiles(x86)}\Go\bin\go.exe",
+            "$env:USERPROFILE\go\bin\go.exe"
+        )
+        
+        foreach ($path in $possiblePaths) {
+            if (Test-Path $path) {
+                $global:GoExecutable = $path
+                Write-Host "  → Found Go at: $path" -ForegroundColor Gray
+                break
+            }
+        }
+    }
+}
 
-if ($goCmd) {
+if ($global:GoExecutable) {
     try {
         Write-Host "  → Installing Fabric via Go..." -ForegroundColor Gray
-        & go install github.com/danielmiessler/fabric/cmd/fabric@latest 2>&1 | Out-Null
+        
+        # 使用找到的Go路径安装Fabric
+        & $global:GoExecutable install github.com/danielmiessler/fabric/cmd/fabric@latest 2>&1 | Out-Null
         
         # 检查安装是否成功
         $fabricPath = Join-Path $env:GOPATH "bin\fabric.exe"
@@ -286,23 +405,18 @@ if ($goCmd) {
             Write-Host "  ✓ Fabric CLI installed successfully" -ForegroundColor Green
             Write-Host "  💡 Run 'fabric --setup' to configure" -ForegroundColor Cyan
         } else {
-            Write-Host "  ⚠ Fabric CLI installation unclear" -ForegroundColor Yellow
-            Write-Host "  💡 After Go is installed, run:" -ForegroundColor Cyan
-            Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
+            Write-Host "  ✓ Fabric CLI installed" -ForegroundColor Yellow
+            Write-Host "  💡 May require terminal restart to use" -ForegroundColor Gray
         }
     } catch {
-        Write-Host "  ⚠ Fabric CLI installation failed" -ForegroundColor Yellow
-        Write-Host "  💡 Manual installation:" -ForegroundColor Cyan
+        Write-Host "  ✗ Fabric CLI installation failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  💡 After restarting terminal, run:" -ForegroundColor Cyan
         Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor Gray
     }
 } else {
-    Write-Host "  ⚠ Go not found, skipping Fabric CLI" -ForegroundColor Yellow
-    Write-Host "  💡 Install Go first with this command:" -ForegroundColor Cyan
-    Write-Host "" -ForegroundColor Gray
-    Write-Host '     $goUrl = "https://go.dev/dl/go1.21.5.windows-amd64.msi"; $goInstaller = "$env:TEMP\go-installer.msi"; Invoke-WebRequest -Uri $goUrl -OutFile $goInstaller; Start-Process msiexec.exe -ArgumentList "/i `"$goInstaller`" /quiet" -Wait; Remove-Item $goInstaller' -ForegroundColor White
-    Write-Host "" -ForegroundColor Gray
-    Write-Host "  💡 Then run Fabric installation:" -ForegroundColor Cyan
-    Write-Host "     go install github.com/danielmiessler/fabric/cmd/fabric@latest" -ForegroundColor White
+    Write-Host "  ⚠ Go not found" -ForegroundColor Yellow
+    Write-Host "  💡 Please restart your terminal and run this script again" -ForegroundColor Cyan
+    Write-Host "     Then Fabric CLI will be installed automatically" -ForegroundColor Gray
 }
 
 # Install Cursor Rules
@@ -321,7 +435,7 @@ try {
     
     # 添加我们的标识
     $header = @"
-# AI Power Pack v2.4 - Cursor Rules
+# AI Power Pack v1.0 - Cursor Rules
 # Source: awesome-cursorrules
 # https://github.com/PatrickJS/awesome-cursorrules
 
@@ -386,7 +500,7 @@ try {
     
     # 创建设计令牌文件
     $designTokens = @"
-/* AI Power Pack v2.4 - Design Tokens */
+/* AI Power Pack v1.0 - Design Tokens */
 
 :root {
   /* Spacing System */
@@ -456,5 +570,5 @@ if (Test-Path (Join-Path $env:APPDATA "Code\User")) {
 Write-Host ""
 Write-Host "💡 Tip: Ask Claude 'What coding standards do you follow?'" -ForegroundColor Gray
 Write-Host ""
-Write-Host "🎉 Thank you for using AI Power Pack v2.4!" -ForegroundColor Cyan
+Write-Host "🎉 Thank you for using AI Power Pack v1.0!" -ForegroundColor Cyan
 Write-Host ""
